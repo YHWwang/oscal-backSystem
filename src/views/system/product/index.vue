@@ -495,6 +495,7 @@ export default {
         (response) => {
           this.productList = response.rows;
           getCategoryList().then((res) => {
+             this.cateNameList =  res.data.categoryList
             cateNameList = res.data.categoryList;
             for (let data of cateNameList) {
               for(let j in this.productList){

@@ -36,7 +36,7 @@ module.exports = {
         //http://3.121.224.63:8088---线上
         //http://123.58.213.6:8101/---测试
         //http://192.168.12.201:8088---本地
-        target: `http://192.168.12.201:8088`,
+        target: `http://3.121.224.63:8088`,
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''
