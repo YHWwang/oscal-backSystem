@@ -169,6 +169,7 @@
           <editor
             v-model="form.newsContext"
             placeholder="请输入新闻内容"
+            :uploadUrl='this.url'
             :min-height="192"
           />
         </el-form-item>
@@ -212,6 +213,7 @@ export default {
   components: { Editor },
   data() {
     return {
+      url:process.env.VUE_APP_BASE_API+'/common/download/summernoteUpload',
       // 遮罩层
       loading: true,
       // 选中数组
