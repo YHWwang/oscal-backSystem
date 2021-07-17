@@ -30,7 +30,7 @@
         />
       </el-form-item> -->
 
-      <el-form-item label="是否签到0没有签到1签到" prop="isSign">
+      <el-form-item label="是否签到" prop="isSign">
          <el-select v-model="queryParams.isSign" placeholder="是否签到0没有签到1签到" clearable size="small">
             <el-option
             v-for="dict in signedOptions"
@@ -41,7 +41,7 @@
         </el-select>
       </el-form-item>
      
-      <el-form-item label="o币" prop="oCoin">
+      <!-- <el-form-item label="o币" prop="oCoin">
         <el-input
           v-model="queryParams.oCoin"
           placeholder="请输入o币"
@@ -76,18 +76,24 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
+      </el-form-item> -->
       
       <el-form-item label="创建日期" prop="creDate">
-        <el-input
+           <el-date-picker clearable size="small" style="width: 200px"
+          v-model="queryParams.creDate"
+          type="date"
+          value-format="yyyy-MM-dd"
+          placeholder="选择创建时间">
+        </el-date-picker>
+        <!-- <el-input
           v-model="queryParams.creDate"
           placeholder="请输入创建日期"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
-        />
+        /> -->
       </el-form-item>
-      <el-form-item label="创建时间" prop="creTime">
+      <!-- <el-form-item label="创建时间" prop="creTime">
         <el-input
           v-model="queryParams.creTime"
           placeholder="请输入创建时间"
@@ -95,8 +101,8 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
-      <el-form-item label="修改日期" prop="upDate">
+      </el-form-item> -->
+      <!-- <el-form-item label="修改日期" prop="upDate">
         <el-input
           v-model="queryParams.upDate"
           placeholder="请输入修改日期"
@@ -113,7 +119,7 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -172,7 +178,7 @@
       <!-- <el-table-column label="登录密码" align="center" prop="loginPassword" />
       <el-table-column label="支付密码" align="center" prop="payPassword" /> -->
       <el-table-column label="默认头像" align="center" prop="headPhoto" />
-      <el-table-column label="是否签到0没有签到1签到" align="center" prop="isSign" :formatter="signedStatus" />
+      <el-table-column label="是否签到" align="center" prop="isSign" :formatter="signedStatus" />
       <el-table-column label="用户点赞数量" align="center" prop="userLikes" />
       <!-- <el-table-column label="流水类型" align="center" prop="opType" />
       <el-table-column label="订单号" align="center" prop="opOrderId" /> -->
@@ -237,7 +243,7 @@
         <el-form-item label="默认头像" prop="headPhoto">
           <el-input v-model="form.headPhoto" placeholder="请输入默认头像" />
         </el-form-item>
-        <el-form-item label="是否签到0没有签到1签到" prop="isSign">
+        <el-form-item label="是否签到" prop="isSign">
           <el-input v-model="form.isSign" placeholder="请输入是否签到0没有签到1签到" />
         </el-form-item>
         <el-form-item label="用户点赞数量" prop="userLikes">

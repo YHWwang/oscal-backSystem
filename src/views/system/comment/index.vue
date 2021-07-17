@@ -36,7 +36,7 @@
           placeholder="选择评论时间">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="评论状态0待审核1通过2拒绝" prop="commentStatus">
+      <el-form-item label="评论状态" prop="commentStatus">
         <el-select v-model="queryParams.commentStatus" placeholder="请选择评论状态0待审核1通过2拒绝" clearable size="small">
            <el-option
             v-for="dict in commentOptions"
@@ -83,7 +83,7 @@
           <span>{{ parseTime(scope.row.commentCre, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="评论状态0待审核1通过2拒绝" align="center" prop="commentStatus" :formatter="commentsStatus" />
+      <el-table-column label="评论状态" align="center" prop="commentStatus" :formatter="commentsStatus" />
       <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button

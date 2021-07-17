@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="158px">
-      <el-form-item label="用户id" prop="userId">
+      <!-- <el-form-item label="用户id" prop="userId">
         <el-input
           v-model="queryParams.userId"
           placeholder="请输入用户id"
@@ -9,7 +9,7 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="1新发2热门3精华4所有" prop="communityType">
         <el-select v-model="queryParams.communityType" placeholder="请选择1新发2热门3精华4所有" clearable size="small">
             <el-option
@@ -29,7 +29,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item> -->
-      <el-form-item label="社区标题" prop="communityTitle">
+      <!-- <el-form-item label="社区标题" prop="communityTitle">
         <el-input
           v-model="queryParams.communityTitle"
           placeholder="请输入社区标题"
@@ -37,7 +37,7 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="创建时间" prop="communityCre">
         <el-date-picker clearable size="small" style="width: 200px"
           v-model="queryParams.communityCre"
@@ -46,14 +46,14 @@
           placeholder="选择创建时间">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="修改时间" prop="communityUp">
+      <!-- <el-form-item label="修改时间" prop="communityUp">
         <el-date-picker clearable size="small" style="width: 200px"
           v-model="queryParams.communityUp"
           type="date"
           value-format="yyyy-MM-dd"
           placeholder="选择修改时间">
         </el-date-picker>
-      </el-form-item>
+      </el-form-item> -->
       <!-- <el-form-item label="排序" prop="communitySort">
         <el-input
           v-model="queryParams.communitySort"
@@ -63,7 +63,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item> -->
-      <el-form-item label="点赞数" prop="communityLike">
+      <!-- <el-form-item label="点赞数" prop="communityLike">
         <el-input
           v-model="queryParams.communityLike"
           placeholder="请输入点赞数"
@@ -89,7 +89,7 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
+      </el-form-item> -->
       <!-- <el-form-item label="简述" prop="communityName">
         <el-input
           v-model="queryParams.communityName"
@@ -126,7 +126,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item> -->
-      <el-form-item label="发帖状态0待审核1审核通过2审核拒绝" prop="communityStatus">
+      <el-form-item label="发帖状态" prop="communityStatus">
         <el-select v-model="queryParams.communityStatus" placeholder="请选择发帖状态0待审核1审核通过2审核拒绝" clearable size="small">
            <el-option
             v-for="dict in commentOptions"
@@ -192,7 +192,7 @@
 
     <el-table v-loading="loading" :data="invitationList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="Index" align="center" prop="id"  />
+      <el-table-column label="帖子编号" align="center" prop="id"  />
       <el-table-column label="用户id" align="center" prop="userId" />
       <el-table-column label="1新发2热门3精华4所有" align="center" prop="communityType" :formatter="postsStatus"/>
       <el-table-column label="社区封面" align="center" prop="communityImg" />
@@ -216,7 +216,7 @@
       <!-- <el-table-column label="是否是新发帖0不是1是" align="center" prop="communityNew" />
       <el-table-column label="是否热门0不热门1热门" align="center" prop="communityHot" />
       <el-table-column label="是否是精华贴0不是1是" align="center" prop="communityBetter" /> -->
-      <el-table-column label="发帖状态0待审核1审核通过2审核拒绝" align="center" prop="communityStatus" :formatter="commentsStatus" />
+      <el-table-column label="发帖状态" align="center" prop="communityStatus" :formatter="commentsStatus" />
       <!-- <el-table-column label="发帖状态0待审核1审核通过2审核拒绝" align="center" prop="oscalCommentCategoryId" /> -->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -247,7 +247,7 @@
     />
 
     <!-- 添加或修改帖子对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="180px">
         <!-- <el-form-item label="用户id" prop="userId">
           <el-input v-model="form.userId" placeholder="请输入用户id" />
@@ -498,7 +498,11 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
-            updateInvitation(this.form).then(response => {
+            let formData = {
+              id:this.form.id,
+              communityType:this.form.communityType
+            }
+            updateInvitation(formData).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
