@@ -9,7 +9,7 @@
       :headers="headers"
       style="display: none"
       ref="upload"
-      v-if="this.uploadUrl"
+      v-if="uploadUrl"
     >
     </el-upload>
     <div class="editor" ref="editor" :style="styles"></div>
@@ -66,7 +66,7 @@ export default {
   data() {
     return {
       headers: {
-        Authorization: "Bearer " + getToken(),
+        // Authorization: "Bearer " + getToken(),
       },
       Quill: null,
       currentValue: "",
@@ -80,7 +80,7 @@ export default {
             container: toolbarOptions,
           },
         },
-        placeholder: "请输入内容"
+        placeholder: "请输入内容",
       },
     };
   },
@@ -162,18 +162,16 @@ export default {
       // 获取富文本组件实例
       let quill = this.Quill;
       // 如果上传成功
-      if (res.code == 200) {
-        // 获取光标所在位置
-        let length = quill.getSelection().index;
-        // 插入图片  res.url为服务器返回的图片地址
-        quill.insertEmbed(length, "image", res.url);
-        // 调整光标到最后
-        quill.setSelection(length + 1);
-      } else {
-        this.$message.error("图片插入失败");
-      }
+      // 获取光标所在位置
+      let length = quill.getSelection().index;
+      // 插入图片  res.url为服务器返回的图片地址
+      console.log(res.url);
+      quill.insertEmbed(length, "image", res.url);
+      // 调整光标到最后
+      quill.setSelection(length + 1);
     },
     handleUploadError() {
+      console.log(res.url);
       this.$message.error("图片插入失败");
     },
   },

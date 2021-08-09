@@ -36,7 +36,7 @@
           placeholder="选择评论时间">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="评论状态" prop="commentStatus">
+      <!-- <el-form-item label="评论状态" prop="commentStatus">
         <el-select v-model="queryParams.commentStatus" placeholder="请选择评论状态0待审核1通过2拒绝" clearable size="small">
            <el-option
             v-for="dict in commentOptions"
@@ -45,7 +45,7 @@
             :value="dict.dictValue"
           />
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -53,7 +53,7 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-     <el-col :span="1.5">
+     <!-- <el-col :span="1.5">
         <el-button
           type="primary"
           icon="el-icon-plus"
@@ -68,7 +68,8 @@
           size="mini"
           @click="sysAudit(2)"
         >批量审核通过</el-button>
-      </el-col>
+
+      </el-col> -->
 	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -83,16 +84,9 @@
           <span>{{ parseTime(scope.row.commentCre, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="评论状态" align="center" prop="commentStatus" :formatter="commentsStatus" />
-      <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <!-- <el-table-column label="评论状态" align="center" prop="commentStatus" :formatter="commentsStatus" /> -->
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:comment:edit']"
-          >修改</el-button>
           <el-button
             size="mini"
             type="text"
@@ -101,7 +95,7 @@
             v-hasPermi="['system:comment:remove']"
           >删除</el-button>
         </template>
-      </el-table-column> -->
+      </el-table-column>
     </el-table>
     
     <pagination
@@ -265,7 +259,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加【请填写功能名称】";
+      this.title = "添加";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -274,7 +268,7 @@ export default {
       getComment(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改【请填写功能名称】";
+        this.title = "修改";
       });
     },
     /** 提交按钮 */
@@ -300,7 +294,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除【请填写功能名称】编号为"' + ids + '"的数据项?', "警告", {
+      this.$confirm('是否确认删除编号为"' + ids + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
@@ -314,7 +308,7 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有【请填写功能名称】数据项?', "警告", {
+      this.$confirm('是否确认导出所有数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"

@@ -17,27 +17,20 @@ export function getInvitation(id) {
   })
 }
 
-// 批量处理通过帖子
-export function sysAuditFun(id) {
-  return request({
-    url: '/system/invitation/'+id,
-    method: 'put'
-  })
-}
-// 批量处理拒绝帖子
-export function sysAuditDelFun( id) {
-  return request({
-    url: '/system/invitation/'+id,
-    method: 'delete'
-  })
-}
-
 // 新增帖子
 export function addInvitation(data) {
   return request({
     url: '/system/invitation',
     method: 'post',
     data: data
+  })
+}
+
+// 获取帖子类别
+export function getTreeselectData() {
+  return request({
+    url: '/system/kind/getKindselect',
+    method: 'get'
   })
 }
 

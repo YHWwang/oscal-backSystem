@@ -213,7 +213,7 @@ export default {
   components: { Editor },
   data() {
     return {
-      url:process.env.VUE_APP_BASE_API+'/common/download/summernoteUpload',
+      url:process.env.VUE_APP_BASE_API + "/summernoteUpload",
       // 遮罩层
       loading: true,
       // 选中数组

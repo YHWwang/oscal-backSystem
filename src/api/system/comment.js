@@ -8,20 +8,7 @@ export function listComment(query) {
     params: query
   })
 }
-// 批量处理通过帖子
-export function sysAuditFun(id) {
-  return request({
-    url: '/system/comment/'+id,
-    method: 'put'
-  })
-}
-// 批量处理拒绝帖子
-export function sysAuditDelFun( id) {
-  return request({
-    url: '/system/comment/'+id,
-    method: 'delete'
-  })
-}
+
 // 查询【请填写功能名称】详细
 export function getComment(id) {
   return request({
