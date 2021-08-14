@@ -86,8 +86,6 @@
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="序号" align="center" prop="id" />
-      <el-table-column label="faq类型名称" align="center" prop="faqName" />
-      <el-table-column label="faq类型标题" align="center" prop="faqTitle" />
       <el-table-column label="faq类型图标" align="center" >
         <template slot-scope="scope">
           <el-image
@@ -97,6 +95,8 @@
           ></el-image>
         </template>
       </el-table-column>
+      <el-table-column label="faq类型名称" align="center" prop="faqName" />
+      <el-table-column label="faq类型标题" align="center" prop="faqTitle" />
       <el-table-column label="创建时间" align="center" prop="faqCre" />
       <el-table-column label="修改时间" align="center" prop="faqUp" />
       <el-table-column

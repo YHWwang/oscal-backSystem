@@ -7,15 +7,15 @@
       v-show="showSearch"
       label-width="158px"
     >
-      <!-- <el-form-item label="用户id" prop="userId">
+      <el-form-item label="帖子编号" prop="id">
         <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入用户id"
+          v-model="queryParams.id"
+          placeholder="请输入帖子编号"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item> -->
+      </el-form-item>
       <el-form-item label="1新发2热门3精华4所有" prop="communityType">
         <el-select
           v-model="queryParams.communityType"
@@ -31,7 +31,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="是否OS帖" prop="osType">
+      <el-form-item label="是否属于板块" prop="osType">
         <el-select
           v-model="queryParams.osType"
           placeholder="请选择"
@@ -270,12 +270,16 @@
         prop="communityType"
         :formatter="postsStatus"
       />
-      <el-table-column
-        label="帖子封面"
-        show-overflow-tooltip
-        align="center"
-        prop="communityImg"
-      />
+      <el-table-column label="帖子封面" show-overflow-tooltip align="center">
+        <template slot-scope="scope">
+          <el-image
+            style="width: 100px; height: 100px"
+            :src="scope.row.communityImg"
+            fit="scale-down"
+          >
+          </el-image>
+        </template>
+      </el-table-column>
       <el-table-column
         label="帖子标题"
         show-overflow-tooltip
@@ -289,7 +293,7 @@
         :formatter="isHomeStatus"
       />
       <el-table-column
-        label="是否OS帖"
+        label="是否属于板块"
         align="center"
         prop="osType"
         :formatter="isOsStatus"
@@ -387,7 +391,7 @@
             :on-success="handleSuccess"
             :on-preview="handlePreview"
             :on-remove="handleRemove"
-            :before-remove="beforeRemove"
+            :before-upload="beforeUpload"
             :file-list="imgFile"
             multiple
             list-type="picture"
@@ -404,7 +408,11 @@
           />
         </el-form-item>
         <el-form-item label="帖子内容" prop="communityContent">
-          <editor v-model="form.communityContent" :uploadUrl="url" :min-height="192" />
+          <editor
+            v-model="form.communityContent"
+            :uploadUrl="url"
+            :min-height="192"
+          />
         </el-form-item>
         <!-- <el-form-item label="创建时间" prop="communityCre">
           <el-date-picker clearable size="small" style="width: 200px"
@@ -458,7 +466,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="是否OS帖" prop="osType">
+        <el-form-item label="是否属于板块" prop="osType">
           <el-select
             v-model="form.osType"
             placeholder="0不是1是"
@@ -552,7 +560,7 @@ export default {
         osType: null,
         oscalCommentCategoryId: null,
         communityType: null,
-        communityImg: "",
+        communityImg: null,
         communityTitle: null,
         communityContent: null,
         communityCre: null,
@@ -561,7 +569,7 @@ export default {
         communityLike: null,
         communityNum: null,
         communityComment: null,
-        communityName: "",
+        communityName: null,
         communityNew: null,
         communityHot: null,
         communityBetter: null,
@@ -593,7 +601,7 @@ export default {
           { required: true, message: "是否首页推荐不能为空", trigger: "blur" },
         ],
         osType: [
-          { required: true, message: "是否OS帖不能为空", trigger: "blur" },
+          { required: true, message: "是否属于板块不能为空", trigger: "blur" },
         ],
       },
     };
@@ -615,9 +623,9 @@ export default {
   },
   methods: {
     handleRemove(file, fileList) {
-      this.form.communityImg = []
-      this.imgFile = []
-      submitForm()
+      this.form.communityImg = [];
+      this.imgFile = [];
+      submitForm();
     },
     handleSuccess(file) {
       console.log(file);
@@ -632,8 +640,42 @@ export default {
       );
     },
 
-    beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
+    beforeUpload(file, fileList) {
+      // 图片文件大小限制
+        let _this = this;
+        let imgWidth = "";
+        let imgHight = "";
+        const isSize = new Promise(function (resolve, reject) {
+          let width = 812;
+          let height = 450;
+          let _URL = window.URL || window.webkitURL;
+          let img = new Image();
+          img.onload = function () {
+            imgWidth = img.width;
+            imgHight = img.height;
+            let valid = img.width == width && img.height == height;
+            valid ? resolve() : reject();
+          };
+          img.src = _URL.createObjectURL(file);
+        }).then(
+          () => {
+            return file;
+          },
+          () => {
+            _this.$message.warning({
+              message:
+                "上传文件的图片大小不合符标准,宽需要为812px，高需要为450px。当前上传图片的宽高分别为：" +
+                imgWidth +
+                "px和" +
+                imgHight +
+                "px",
+              btn: false,
+            });
+            return Promise.reject();
+          }
+        );
+        console.log(isSize);
+        return isSize;
     },
     selectCategoryId(value) {
       // console.log(value);
@@ -724,7 +766,7 @@ export default {
     },
     // 表单重置
     reset() {
-      this.imgFile = []
+      this.imgFile = [];
       this.form = {
         id: null,
         userId: null,
@@ -782,10 +824,7 @@ export default {
       const id = row.id || this.ids;
       getInvitation(id).then((response) => {
         this.form = response.data;
-        this.imgFile.push(
-          {'url':response.data.communityImg,
-          'name':'Image'}
-          ) 
+        this.imgFile.push({ url: response.data.communityImg, name: "Image" });
         this.postID = response.data.oscalCommentCategoryId;
         this.open = true;
         this.title = "修改帖子";
@@ -864,3 +903,8 @@ export default {
   },
 };
 </script>
+<style>
+.el-upload-list--picture .el-upload-list__item {
+  transition: all 0s;
+}
+</style>

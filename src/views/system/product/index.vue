@@ -117,15 +117,26 @@
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="商品id" align="center" prop="id" />
+      <el-table-column label="商品图片" align="center">
+        <template slot-scope="scope">
+          <el-image
+            style="width: 50px; height: 50px"
+            :src="scope.row.image"
+            fit="scale-down"
+            @click="imgClick(scope.row.image)"
+            :preview-src-list="srcList"
+          ></el-image>
+        </template>
+      </el-table-column>
+      <el-table-column label="商品名称" align="center" prop="storeName" />
       <el-table-column label="产品类别" align="center" prop="cateId" />
-      <el-table-column label="商品图片" align="center" prop="image" />
       <!-- <el-table-column
         label="轮播图"
         align="center"
         prop="sliderImage"
         show-overflow-tooltip
       /> -->
-      <el-table-column label="商品名称" align="center" prop="storeName" />
+
       <el-table-column
         label="商品简介"
         align="center"
@@ -194,15 +205,24 @@
           />
         </el-form-item> -->
         <el-form-item label="商品图片" prop="image">
-          <el-input v-model="form.image" placeholder="请输入商品图片" />
+          <el-upload
+            class="upload-demo"
+            :action="imgUrl"
+            :on-success="handleSuccess"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            :before-remove="beforeRemove"
+            multiple
+            list-type="picture"
+            :limit="1"
+            :file-list="imgFile"
+            :on-exceed="handleExceed"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+          <!-- <el-input v-model="form.image" placeholder="请输入商品图片" /> -->
         </el-form-item>
-        <!-- <el-form-item label="轮播图" prop="sliderImage">
-          <el-input
-            v-model="form.sliderImage"
-            type="textarea"
-            placeholder="请输入轮播图地址"
-          />
-        </el-form-item> -->
+
         <el-form-item label="商品名称" prop="storeName">
           <el-input v-model="form.storeName" placeholder="请输入商品名称" />
         </el-form-item>
@@ -268,9 +288,7 @@
         <el-form-item label="是否首发新品" prop="isNew">
           <el-input v-model="form.isNew" placeholder="请输入是否首发新品" />
         </el-form-item>
-        <el-form-item label="产品描述" prop="description">
-          <el-input v-model="form.description" placeholder="请输入产品描述" />
-        </el-form-item> -->
+      -->
         <!-- <el-form-item label="添加时间" prop="addTime">
           <el-input v-model="form.addTime" placeholder="请输入添加时间" />
         </el-form-item> -->
@@ -283,6 +301,26 @@
               >{{ dict.dictLabel }}</el-radio
             >
           </el-radio-group>
+        </el-form-item>
+        <el-form-item label="产品购买链接" prop="soureLink">
+          <el-input v-model="form.soureLink" placeholder="请输入产品购买链接" />
+        </el-form-item>
+        <el-form-item label="跳转url" prop="productUrl">
+          <el-input v-model="form.productUrl" placeholder="请输入跳转url" />
+        </el-form-item>
+        <el-form-item label="产品描述" prop="description">
+          <el-input
+            type="textarea"
+            v-model="form.description"
+            placeholder="请输入产品描述"
+          />
+        </el-form-item>
+        <el-form-item label="规格书" prop="specification">
+          <el-input
+            type="textarea"
+            v-model="form.specification"
+            placeholder="请输入规格书"
+          />
         </el-form-item>
         <!-- <el-form-item label="是否删除(0：未删除，1：删除)" prop="isDel">
           <el-input v-model="form.isDel" placeholder="请输入是否删除(0：未删除，1：删除)" />
@@ -314,18 +352,12 @@
         <el-form-item label="产品二维码地址(用户小程序海报)" prop="codePath">
           <el-input v-model="form.codePath" placeholder="请输入产品二维码地址(用户小程序海报)" />
         </el-form-item>
-        <el-form-item label="产品购买链接" prop="soureLink">
-          <el-input v-model="form.soureLink" placeholder="请输入产品购买链接" />
-        </el-form-item>
+      
         <el-form-item label="首页hot图片" prop="hotImage">
           <el-input v-model="form.hotImage" placeholder="请输入首页hot图片" />
         </el-form-item>
-        <el-form-item label="跳转url" prop="productUrl">
-          <el-input v-model="form.productUrl" placeholder="请输入跳转url" />
-        </el-form-item>
-        <el-form-item label="规格书" prop="specification">
-          <el-input v-model="form.specification" placeholder="请输入规格书" />
-        </el-form-item>
+       
+      
         <el-form-item label="关联的商品id集合" prop="recommond">
           <el-input v-model="form.recommond" placeholder="请输入关联的商品id集合" />
         </el-form-item>
@@ -375,6 +407,11 @@ export default {
   name: "Product",
   data() {
     return {
+      imgFile: [],
+      srcList: [
+        "https://d2kbvjszk9d5ln.cloudfront.net/yshop/upload/pic/c20-20210805071240485.png",
+      ],
+      imgUrl: process.env.VUE_APP_BASE_API + "/summernoteUpload",
       // 遮罩层
       loading: true,
       // 选中数组
@@ -483,8 +520,33 @@ export default {
     });
   },
   methods: {
+    imgClick(link) {
+      this.srcList.length = 0;
+      this.srcList.push(link);
+    },
     statusFormat(row, column) {
       return this.selectDictLabel(this.showOptions, row.isPostage);
+    },
+    handleRemove(file, fileList) {
+      this.form.image = [];
+      this.imgFile = [];
+      console.log(file, fileList);
+    },
+    handleSuccess(file) {
+      console.log(file);
+      this.form.image = file.url;
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(
+        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件`
+      );
+    },
+
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
     },
 
     /** 查询商品列表 */
@@ -495,13 +557,13 @@ export default {
         (response) => {
           this.productList = response.rows;
           getCategoryList().then((res) => {
-             this.cateNameList =  res.data.categoryList
+            this.cateNameList = res.data.categoryList;
             cateNameList = res.data.categoryList;
             for (let data of cateNameList) {
-              for(let j in this.productList){
+              for (let j in this.productList) {
                 if (data.id == this.productList[j].cateId) {
-                 this.productList[j].cateId = data.cate_name;
-              }
+                  this.productList[j].cateId = data.cate_name;
+                }
               }
             }
           });
@@ -517,6 +579,7 @@ export default {
     },
     // 表单重置
     reset() {
+      this.imgFile = [];
       this.form = {
         id: null,
         merId: null,
@@ -604,6 +667,7 @@ export default {
             break;
           }
         }
+        this.imgFile.push({ url: response.data.image, name: "Image" });
         this.open = true;
         this.title = "修改商品";
       });
@@ -673,3 +737,8 @@ export default {
   },
 };
 </script>
+<style>
+.el-upload-list--picture .el-upload-list__item {
+  transition: all 0s;
+}
+</style>

@@ -50,7 +50,16 @@
     <el-table v-loading="loading" :data="imgList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="序号" align="center" prop="id" />
-      <el-table-column label="中部封面图片" align="center" prop="middleImg" />
+      <el-table-column label="中部封面图片" align="center" >
+       <template slot-scope="scope">
+          <el-image
+            style="width: 100px; height: 100px"
+            :src="scope.row.middleImg"
+            fit='scale-down'
+          >
+          </el-image>
+       </template>
+      </el-table-column>
       <el-table-column label="中部标题" align="center" prop="middleTitle" />
       <el-table-column label="中部规格" align="center" prop="middleSpecification" show-overflow-tooltip/>
       <el-table-column label="创建时间" align="center" prop="middleCre" />
@@ -87,7 +96,22 @@
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="中部封面图片" prop="middleImg">
-          <el-input v-model="form.middleImg" placeholder="请输入中部封面图片" />
+          <el-upload
+            class="upload-demo"
+            :action="imgUrl"
+            :on-success="handleSuccess"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            :before-remove="beforeRemove"
+            multiple
+            list-type="picture"
+            :limit="1"
+            :file-list="imgFile"
+            :on-exceed="handleExceed"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+          <!-- <el-input v-model="form.middleImg" placeholder="请输入中部封面图片" /> -->
         </el-form-item>
         <el-form-item label="中部标题" prop="middleTitle">
           <el-input v-model="form.middleTitle" placeholder="请输入中部标题" />
@@ -111,6 +135,8 @@ export default {
   name: "Img",
   data() {
     return {
+       imgFile: [],
+      imgUrl: process.env.VUE_APP_BASE_API + "/summernoteUpload",
       // 遮罩层
       loading: true,
       // 选中数组
@@ -161,6 +187,27 @@ export default {
     this.getList();
   },
   methods: {
+      handleRemove(file, fileList) {
+      this.form.middleImg = [];
+      this.imgFile = [];
+      console.log(file, fileList);
+    },
+    handleSuccess(file) {
+      console.log(file);
+      this.form.middleImg = file.url;
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(
+        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件`
+      );
+    },
+
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
     /** 查询底部轮播图列表 */
     getList() {
       this.loading = true;
@@ -177,6 +224,7 @@ export default {
     },
     // 表单重置
     reset() {
+        this.imgFile = []
       this.form = {
         id: null,
         middleImg: null,
@@ -216,6 +264,10 @@ export default {
       const id = row.id || this.ids
       getImg(id).then(response => {
         this.form = response.data;
+          this.imgFile.push(
+          {'url':response.data.middleImg,
+          'name':'Image'}
+          ) 
         this.open = true;
         this.title = "修改底部轮播图";
       });
@@ -271,3 +323,8 @@ export default {
   }
 };
 </script>
+<style>
+.el-upload-list--picture .el-upload-list__item{
+  transition: all 0s;
+}
+</style>

@@ -1,143 +1,105 @@
 <template>
-  <div class="app-container">
-    <el-form
-      :model="queryParams"
-      ref="queryForm"
-      :inline="true"
-      v-show="showSearch"
-      label-width="128px"
+  <div>
+    <el-table
+      :id="name"
+      class="tabChlid"
+      :data="kindList"
+      style="width: 100%"
+      :header-row-style="head"
     >
-      <el-form-item label="编号" prop="id">
-        <el-input
-          v-model="queryParams.id"
-          placeholder="请输入编号"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="分类名称" prop="categoryCateName">
-        <el-input
-          v-model="queryParams.categoryCateName"
-          placeholder="请输入分类名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <!-- <el-form-item label="排序" prop="categorySort">
-        <el-input
-          v-model="queryParams.categorySort"
-          placeholder="请输入排序"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item> -->
-      <el-form-item label="是否显示" prop="categoryIsShow">
-        <el-select
-          v-model="queryParams.categoryIsShow"
-          placeholder="请输入是否推荐0不显示1显示"
-          clearable
-          size="small"
-        >
-          <el-option
-            v-for="dict in postCategoryOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="是否属于板块" prop="isOs">
-        <el-select
-          v-model="queryParams.isOs"
-          placeholder="请选择属于1不属于0"
-          clearable
-          size="small"
-        >
-          <el-option
-            v-for="dict in isOsOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="添加时间" prop="addTime">
-        <el-date-picker
-          clearable
-          size="small"
-          style="width: 200px"
-          v-model="queryParams.addTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择添加时间"
-        >
-        </el-date-picker>
-      </el-form-item>
-      <!-- <el-form-item label="添加时间" prop="categoryHoverPic">
-        <el-input
-          v-model="queryParams.categoryHoverPic"
-          placeholder="请输入添加时间"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="修改时间" prop="upTime">
-        <el-date-picker clearable size="small" style="width: 200px"
-          v-model="queryParams.upTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择修改时间">
-        </el-date-picker>
-      </el-form-item> -->
-      <el-form-item>
-        <el-button
-          type="cyan"
-          icon="el-icon-search"
-          size="mini"
-          @click="handleQuery"
-          >搜索</el-button
-        >
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery"
-          >重置</el-button
-        >
-      </el-form-item>
-    </el-form>
-
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['system:kind:add']"
-          >新增</el-button
-        >
-      </el-col>
-      <right-toolbar
-        :showSearch.sync="showSearch"
-        @queryTable="getList"
-      ></right-toolbar>
-    </el-row>
-    <TreeTable
-      @give-advice="showAdvice"
-      :kindList="kindList"
-      :head="headClass"
-      name="tab1"
-    ></TreeTable>
-
-    <pagination
-      v-show="total > 0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
-
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <TreeTableName
+            v-if="props.row.children"
+            @give-advice="showAdvice"
+            :kindList="props.row.children"
+            :head="headClass"
+          ></TreeTableName>
+        </template>
+      </el-table-column>
+      <el-table-column label="ID" align="center" prop="id" />
+      <!-- <el-table-column label="父id" align="center" prop="categoryPid" /> -->
+      <el-table-column label="图标" show-overflow-tooltip align="center">
+        <template slot-scope="scope">
+          <el-image
+            style="width: 50px; height: 50px"
+            :src="scope.row.categoryPic"
+            fit="scale-down"
+          ></el-image>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="分类名称"
+        align="center"
+        prop="categoryCateName"
+      />
+      <el-table-column label="排序" align="center" prop="categorySort" />
+      <el-table-column
+        label="是否属于板块"
+        align="center"
+        prop="isOs"
+        :formatter="isOsStatus"
+      />
+      <el-table-column
+        label="是否显示"
+        align="center"
+        prop="categoryIsShow"
+        :formatter="postCategoryStatus"
+      />
+      <el-table-column
+        label="添加时间"
+        align="center"
+        prop="addTime"
+        width="180"
+      >
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.addTime, "{y}-{m}-{d}") }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="修改时间"
+        align="center"
+        prop="upTime"
+        width="180"
+      >
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.upTime, "{y}-{m}-{d}") }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="操作"
+        width="200"
+        align="center"
+        class-name="small-padding fixed-width"
+      >
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-plus"
+            @click="handleAddChild(scope.row)"
+            v-hasPermi="['system:kind:edit']"
+            >增加</el-button
+          >
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="handleUpdate(scope.row)"
+            v-hasPermi="['system:kind:edit']"
+            >修改</el-button
+          >
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-delete"
+            @click="handleDelete(scope.row)"
+            v-hasPermi="['system:kind:remove']"
+            >删除</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
     <!-- 添加或修改商品分类对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
@@ -239,12 +201,16 @@
 </template>
 
 <script>
-import { listKind, addKind, updateKind } from "@/api/system/kind";
-import TreeTable from "@/components/treeTable/index";
-// import {Table} from "./table.vue"
+import {
+  listKind,
+  getKind,
+  delKind,
+  addKind,
+  updateKind,
+  exportKind,
+} from "@/api/system/kind";
 export default {
-  name: "Kind",
-  components: { TreeTable },
+  name: "TreeTableName",
   data() {
     return {
       imgFile: [],
@@ -262,8 +228,6 @@ export default {
       // 总条数
       total: 0,
       // 商品分类表格数据
-      kindList: [],
-      kindListChild: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -303,8 +267,20 @@ export default {
       },
     };
   },
+  props: {
+    kindList: {
+      default: "",
+    },
+    name: {
+      typeof: String,
+      default: "",
+    },
+    head: {
+      typeof: Object,
+      default: "",
+    },
+  },
   created() {
-    this.getList();
     this.getDicts("sys_postCategory_show").then((response) => {
       this.postCategoryOptions = response.data;
     });
@@ -314,8 +290,11 @@ export default {
   },
   methods: {
     showAdvice(advice) {
-      this.kindList = advice;
-      console.log(advice);
+      //  this.$emit("kindList", advice);  无法回调数据，可能是由于kindList在组件直接没进行传值
+      this.$emit("give-advice", advice);
+    },
+    headClass() {
+      return "display:none";
     },
     handleRemove(file, fileList) {
       this.form.categoryPic = [];
@@ -338,16 +317,14 @@ export default {
     beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
-    headClass() {
-      return "display:black";
-    },
 
     /** 查询商品分类列表 */
     getList() {
       this.loading = true;
       listKind(this.queryParams).then((response) => {
-        this.kindList = response.rows;
-        // console.log(this.handleTree(response.rows, "id", "categoryPid"));
+        this.$emit("give-advice", response.rows);
+        //  this.kindList = response.rows
+        // location.reload()
         this.loading = false;
       });
     },
@@ -381,16 +358,6 @@ export default {
       };
       this.resetForm("form");
     },
-    /** 搜索按钮操作 */
-    handleQuery() {
-      this.queryParams.pageNum = 1;
-      this.getList();
-    },
-    /** 重置按钮操作 */
-    resetQuery() {
-      this.resetForm("queryForm");
-      this.handleQuery();
-    },
 
     /** 新增按钮操作 */
     handleAdd() {
@@ -398,12 +365,33 @@ export default {
       this.open = true;
       this.title = "添加商品分类";
     },
+    /** 删除按钮操作 */
+    handleDelete(row) {
+      const ids = row.id || this.ids;
+      this.$confirm(
+        '是否确认删除商品分类编号为"' + ids + '"的数据项?',
+        "警告",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(function () {
+          return delKind(ids);
+        })
+        .then(() => {
+          this.getList();
+          this.msgSuccess("删除成功");
+        });
+    },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate((valid) => {
         if (valid) {
           if (this.form.id != null) {
             updateKind(this.form).then((response) => {
+              console.log(this.form);
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
@@ -418,15 +406,41 @@ export default {
         }
       });
     },
+    /** 新增子类按钮操作 */
+    handleAddChild(row) {
+      this.reset();
+      this.form.categoryPid = row.id;
+      console.log(row);
+      this.open = true;
+      this.title = "添加子类商品分类";
+    },
+    /** 修改按钮操作 */
+    handleUpdate(row) {
+      this.imgFile.length = 0;
+      this.reset();
+      const id = row.id || this.ids;
+      getKind(id).then((response) => {
+        this.form = response.data;
+        this.imgFile.push({ url: response.data.categoryPic, name: "Image" });
+        this.open = true;
+        this.title = "修改商品分类";
+      });
+    },
   },
 };
 </script>
-<style>
-.el-upload-list--picture .el-upload-list__item {
-  transition: all 0s;
-}
 
-.el-table .el-table__body .el-table__expanded-cell {
-  padding: 0;
+<style>
+#tab1 table .el-table__body .el-table__expand-column {
+  padding-left: 32px;
+}
+#tab1 .tabChlid .tabChlid .el-table__expand-column {
+  padding-left: 64px;
+}
+#tab1 .tabChlid .tabChlid button:nth-child(1) {
+  display: none;
+}
+#tab1 .tabChlid .tabChlid .el-table__expand-column .cell {
+  display: none;
 }
 </style>

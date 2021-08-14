@@ -177,7 +177,15 @@
       <!-- <el-table-column label="昵称" align="center" prop="nickName" /> -->
       <!-- <el-table-column label="登录密码" align="center" prop="loginPassword" />
       <el-table-column label="支付密码" align="center" prop="payPassword" /> -->
-      <el-table-column label="默认头像" align="center" prop="headPhoto" />
+      <el-table-column label="默认头像" align="center">
+       <template slot-scope="scope">
+          <el-image
+            style="width: 50px; height: 50px"
+            :src="scope.row.headPhoto"
+            fit='scale-down'
+          ></el-image>
+        </template>
+      </el-table-column>
       <el-table-column label="是否签到" align="center" prop="isSign" :formatter="signedStatus" />
       <el-table-column label="用户点赞数量" align="center" prop="userLikes" />
       <!-- <el-table-column label="流水类型" align="center" prop="opType" />

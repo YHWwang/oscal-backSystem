@@ -75,8 +75,16 @@
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="商品分类表ID" align="center" prop="id" />
+         <el-table-column label="图标" align="center">
+            <template slot-scope="scope">
+          <el-image
+            style="width: 100px; height: 100px"
+            :src="scope.row.pic"
+            fit='scale-down'
+          ></el-image>
+        </template>
+         </el-table-column>
       <el-table-column label="分类名称" align="center" prop="cateName" />
-      <el-table-column label="图标" align="center" prop="pic" />
       <el-table-column
         label="展示状态"
         align="center"
@@ -156,12 +164,27 @@
         <el-form-item label="排序" prop="sort">
           <el-input v-model="form.sort" placeholder="请输入排序" />
         </el-form-item>
-        <el-form-item label="图标" prop="pic">
-          <el-input
+        <el-form-item label="请上传图标">
+           <el-upload
+            class="upload-demo"
+            :action="imgUrl"
+            :on-success="handleSuccess"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            :before-remove="beforeRemove"
+            multiple
+            list-type="picture"
+            :limit="1"
+            :file-list="imgFile"
+            :on-exceed="handleExceed"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+          <!-- <el-input
             v-model="form.pic"
             type="textarea"
             placeholder="请输入图标地址"
-          />
+          /> -->
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -187,6 +210,8 @@ export default {
   name: "Category",
   data() {
     return {
+      imgFile: [],
+      imgUrl: process.env.VUE_APP_BASE_API + "/summernoteUpload",
       // 遮罩层
       loading: true,
       // 选中数组
@@ -246,6 +271,27 @@ export default {
     statusFormat(row, column) {
       return this.selectDictLabel(this.showOptions, row.isShow);
     },
+  handleRemove(file, fileList) {
+      this.form.pic = [];
+      this.imgFile = [];
+      console.log(file, fileList);
+    },
+    handleSuccess(file) {
+      console.log(file);
+      this.form.pic = file.url;
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(
+        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件`
+      );
+    },
+
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
 
     /** 查询商品分类列表 */
     getList() {
@@ -268,6 +314,7 @@ export default {
     },
     // 表单重置
     reset() {
+      this.imgFile = []
       this.form = {
         id: null,
         pid: null,
@@ -309,6 +356,10 @@ export default {
       const id = row.id || this.ids;
       getCategory(id).then((response) => {
         this.form = response.data;
+         this.imgFile.push(
+          {'url':response.data.pic,
+          'name':'Image'}
+          ) 
         this.open = true;
         this.title = "修改商品分类";
       });
@@ -371,3 +422,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.el-upload-list--picture .el-upload-list__item{
+  transition: all 0s;
+}
+</style>

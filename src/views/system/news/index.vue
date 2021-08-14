@@ -106,16 +106,24 @@
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="序号" align="center" prop="id" />
-      <el-table-column label="新闻标题" align="center" prop="newsTitle" />
+      <el-table-column label="封面图片" align="center">
+         <template slot-scope="scope">
+          <el-image
+            style="width: 50px; height: 50px"
+            :src="scope.row.newsImg"
+            fit='scale-down'
+          ></el-image>
+        </template>
+      </el-table-column>
+      <el-table-column label="新闻标题" align="center" prop="newsTitle" show-overflow-tooltip />
       <el-table-column
         label="展示状态"
         align="center"
         prop="newsShow"
         :formatter="statusFormat"
       />
-      <el-table-column label="封面图片" align="center" prop="newsImg" />
       <el-table-column label="排序" align="center" prop="newsSort" />
-      <el-table-column label="简要描述" align="center" prop="newsSimDes" />
+      <el-table-column label="简要描述" align="center" prop="newsSimDes" show-overflow-tooltip />
       <el-table-column label="新闻创建时间" align="center" prop="newsCre" />
       <el-table-column label="新闻修改时间" align="center" prop="newsUp" />
 
@@ -156,8 +164,23 @@
     <!-- 添加或修改新闻对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="新闻图片" prop="newsImg">
-          <el-input v-model="form.newsImg" placeholder="请输入新闻图片" />
+        <el-form-item label="新闻图片">
+          <!-- <el-input v-model="form.newsImg" placeholder="请输入新闻图片" /> -->
+           <el-upload
+            class="upload-demo"
+            :action="url"
+            :on-success="handleSuccess"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            :before-remove="beforeRemove"
+            multiple
+            list-type="picture"
+            :limit="1"
+            :file-list="imgFile"
+            :on-exceed="handleExceed"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
         </el-form-item>
         <el-form-item label="新闻标题" prop="newsTitle">
           <el-input v-model="form.newsTitle" placeholder="请输入新闻标题" />
@@ -213,6 +236,7 @@ export default {
   components: { Editor },
   data() {
     return {
+      imgFile: [],
       url:process.env.VUE_APP_BASE_API + "/summernoteUpload",
       // 遮罩层
       loading: true,
@@ -278,6 +302,27 @@ export default {
     });
   },
   methods: {
+      handleRemove(file, fileList) {
+      this.form.newsImg = [];
+      this.imgFile = [];
+      console.log(file, fileList);
+    },
+    handleSuccess(file) {
+      console.log(file);
+      this.form.newsImg = file.url;
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(
+        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件`
+      );
+    },
+
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
     statusFormat(row, column) {
       return this.selectDictLabel(this.showOptions, row.newsShow);
     },
@@ -297,6 +342,7 @@ export default {
     },
     // 表单重置
     reset() {
+      this.imgFile = [];
       this.form = {
         id: null,
         newsImg: null,
@@ -339,6 +385,10 @@ export default {
       const id = row.id || this.ids;
       getNews(id).then((response) => {
         this.form = response.data;
+        this.imgFile.push(
+          {'url':response.data.newsImg,
+          'name':'Image'}
+        ) 
         this.open = true;
         this.title = "修改新闻";
       });
@@ -397,3 +447,8 @@ export default {
   },
 };
 </script>
+<style>
+.el-upload-list--picture .el-upload-list__item{
+  transition: all 0s;
+}
+</style>
