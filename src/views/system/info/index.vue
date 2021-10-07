@@ -168,7 +168,7 @@
 	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row> -->
 
-    <el-table v-loading="loading" :data="infoList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="infoList" :default-sort = "{prop: 'date', order: 'descending'}" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="60" align="center" />
       <el-table-column label="Index" align="center" prop="id" />
       <el-table-column label="账号" align="center" prop="sysUserAccount" />
@@ -186,14 +186,14 @@
           ></el-image>
         </template>
       </el-table-column>
-      <el-table-column label="是否签到" align="center" prop="isSign" :formatter="signedStatus" />
-      <el-table-column label="用户点赞数量" align="center" prop="userLikes" />
+      <el-table-column label="是否签到" sortable align="center" prop="isSign" :formatter="signedStatus" />
+      <el-table-column label="用户点赞数量" sortable align="center" prop="userLikes" />
       <!-- <el-table-column label="流水类型" align="center" prop="opType" />
       <el-table-column label="订单号" align="center" prop="opOrderId" /> -->
-      <el-table-column label="o币" align="center" prop="oCoin" />
-      <el-table-column label="关注了谁人数" align="center" prop="userFollowing" />
-      <el-table-column label="被关注人数" align="center" prop="userFollowers" />
-      <el-table-column label="用户发帖数" align="center" prop="userPosts" />
+      <el-table-column label="o币" sortable align="center" prop="oCoin" />
+      <el-table-column label="关注了谁人数" sortable align="center" prop="userFollowing" />
+      <el-table-column label="被关注人数" sortable align="center" prop="userFollowers" />
+      <el-table-column label="用户发帖数" sortable align="center" prop="userPosts" />
       <!-- <el-table-column label="ip" align="center" prop="lastLoginIp" /> -->
       <el-table-column label="创建日期" align="center" prop="creDate" />
       <!-- <el-table-column label="创建时间" align="center" prop="creTime" /> -->

@@ -10,7 +10,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="社区文章id" prop="communityId">
+      <!-- <el-form-item label="社区文章id" prop="communityId">
         <el-input
           v-model="queryParams.communityId"
           placeholder="请输入社区文章id"
@@ -18,7 +18,7 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="评论内容" prop="comment">
         <el-input
           v-model="queryParams.comment"
@@ -28,9 +28,9 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="评论时间" prop="commentCre">
+      <el-form-item label="评论时间" prop="createTime">
         <el-date-picker clearable size="small" style="width: 200px"
-          v-model="queryParams.commentCre"
+          v-model="queryParams.createTime"
           type="date"
           value-format="yyyy-MM-dd"
           placeholder="选择评论时间">
@@ -73,17 +73,17 @@
 	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="commentList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="commentList" :default-sort = "{prop: 'date', order: 'descending'}" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="序号" align="center" prop="id" />
       <el-table-column label="用户id" align="center" prop="userId" />
-      <el-table-column label="社区文章id" align="center" prop="communityId" />
-      <el-table-column label="评论内容" align="center" prop="comment" show-overflow-tooltip />
-      <el-table-column label="评论时间" align="center" prop="commentCre" width="180">
+      <!-- <el-table-column label="社区文章id" align="center" prop="entityId" /> -->
+      <el-table-column label="评论内容" align="center" prop="content" show-overflow-tooltip >
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.commentCre, '{y}-{m}-{d}') }}</span>
+         <div v-html="scope.row.content"></div>
         </template>
       </el-table-column>
+      <el-table-column label="评论时间" sortable align="center" prop="createTime" width="180"/>
       <!-- <el-table-column label="评论状态" align="center" prop="commentStatus" :formatter="commentsStatus" /> -->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -172,7 +172,7 @@ export default {
         userId: null,
         communityId: null,
         comment: null,
-        commentCre: null,
+        createTime: null,
         commentStatus: null
       },
       commentOptions:'',

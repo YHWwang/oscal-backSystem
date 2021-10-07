@@ -115,12 +115,13 @@
     <el-table
       v-loading="loading"
       :data="detailList"
+      :default-sort = "{prop: 'date', order: 'descending'}"
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="序号" align="center" prop="id" />
-      <el-table-column label="产品分类id" align="center" prop="categoryId" />
-      <el-table-column label="faq的id" align="center" prop="faqId" />
+      <el-table-column label="产品分类id" align="center" sortable prop="categoryId" />
+      <el-table-column label="faq的id" align="center" sortable prop="faqId" />
       <el-table-column label="标题" align="center" prop="faqDetailTitle" />
       <el-table-column
         label="内容"

@@ -113,6 +113,7 @@
     <el-table
       v-loading="loading"
       :data="productList"
+      :default-sort = "{prop: 'date', order: 'descending'}"
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
@@ -129,7 +130,7 @@
         </template>
       </el-table-column>
       <el-table-column label="商品名称" align="center" prop="storeName" />
-      <el-table-column label="产品类别" align="center" prop="cateId" />
+      <el-table-column label="产品类别" sortable align="center" prop="cateId" />
       <!-- <el-table-column
         label="轮播图"
         align="center"
@@ -156,6 +157,7 @@
       </el-table-column>
       <el-table-column
         label="官网上架状态"
+        sortable
         align="center"
         prop="isPostage"
         :formatter="statusFormat"

@@ -260,6 +260,7 @@
       v-loading="loading"
       :data="invitationList"
       @selection-change="handleSelectionChange"
+      :default-sort="{ prop: 'date', order: 'descending' }"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="帖子编号" align="center" prop="id" />
@@ -267,6 +268,7 @@
       <el-table-column
         label="1新发2热门3精华4所有"
         align="center"
+        sortable
         prop="communityType"
         :formatter="postsStatus"
       />
@@ -290,13 +292,33 @@
         label="首页推荐"
         align="center"
         prop="isHomeIndex"
+        sortable
         :formatter="isHomeStatus"
       />
       <el-table-column
         label="是否属于板块"
         align="center"
+        sortable
         prop="osType"
         :formatter="isOsStatus"
+      />
+      <el-table-column
+        label="点赞数"
+        align="center"
+        sortable
+        prop="communityLike"
+      />
+      <el-table-column
+        label="浏览量"
+        align="center"
+        sortable
+        prop="communityNum"
+      />
+      <el-table-column
+        label="评论量"
+        align="center"
+        sortable
+        prop="communityComment"
       />
       <el-table-column
         label="创建时间"
@@ -319,9 +341,7 @@
         </template>
       </el-table-column>
       <!-- <el-table-column label="排序" align="center" prop="communitySort" /> -->
-      <el-table-column label="点赞数" align="center" prop="communityLike" />
-      <el-table-column label="浏览量" align="center" prop="communityNum" />
-      <el-table-column label="评论量" align="center" prop="communityComment" />
+
       <!-- <el-table-column label="简述" align="center" prop="communityName" /> -->
       <!-- <el-table-column label="是否是新发帖0不是1是" align="center" prop="communityNew" />
       <el-table-column label="是否热门0不热门1热门" align="center" prop="communityHot" />
@@ -642,40 +662,40 @@ export default {
 
     beforeUpload(file, fileList) {
       // 图片文件大小限制
-        let _this = this;
-        let imgWidth = "";
-        let imgHight = "";
-        const isSize = new Promise(function (resolve, reject) {
-          let width = 812;
-          let height = 450;
-          let _URL = window.URL || window.webkitURL;
-          let img = new Image();
-          img.onload = function () {
-            imgWidth = img.width;
-            imgHight = img.height;
-            let valid = img.width == width && img.height == height;
-            valid ? resolve() : reject();
-          };
-          img.src = _URL.createObjectURL(file);
-        }).then(
-          () => {
-            return file;
-          },
-          () => {
-            _this.$message.warning({
-              message:
-                "上传文件的图片大小不合符标准,宽需要为812px，高需要为450px。当前上传图片的宽高分别为：" +
-                imgWidth +
-                "px和" +
-                imgHight +
-                "px",
-              btn: false,
-            });
-            return Promise.reject();
-          }
-        );
-        console.log(isSize);
-        return isSize;
+      let _this = this;
+      let imgWidth = "";
+      let imgHight = "";
+      const isSize = new Promise(function (resolve, reject) {
+        let width = 812;
+        let height = 450;
+        let _URL = window.URL || window.webkitURL;
+        let img = new Image();
+        img.onload = function () {
+          imgWidth = img.width;
+          imgHight = img.height;
+          let valid = img.width == width && img.height == height;
+          valid ? resolve() : reject();
+        };
+        img.src = _URL.createObjectURL(file);
+      }).then(
+        () => {
+          return file;
+        },
+        () => {
+          _this.$message.warning({
+            message:
+              "上传文件的图片大小不合符标准,宽需要为812px，高需要为450px。当前上传图片的宽高分别为：" +
+              imgWidth +
+              "px和" +
+              imgHight +
+              "px",
+            btn: false,
+          });
+          return Promise.reject();
+        }
+      );
+      console.log(isSize);
+      return isSize;
     },
     selectCategoryId(value) {
       // console.log(value);
@@ -687,40 +707,21 @@ export default {
         // this.options = copyTransFun(res.data)
         let col = [];
         let arr = res.data;
+
         arr.forEach((item, index) => {
-          col.push({
-            value: item.id,
-            label: item.label,
-            children: item.children,
-          });
-        });
-        col.forEach((_item, _index) => {
-          if (_item.children && _item.children.length) {
-            _item.children.forEach((item, index) => {
-              if (item.children && item.children.length) {
-                if (Object.getOwnPropertyNames(item).length) {
-                  item.value = item.id;
-                  item.label = item.label;
-                  delete item.id;
-                }
-                item.children.forEach((item, index) => {
-                  if (Object.getOwnPropertyNames(item).length) {
-                    item.value = item.id;
-                    item.label = item.label;
-                    delete item.id;
-                  }
-                });
-              } else {
-                if (Object.getOwnPropertyNames(item).length) {
-                  item.value = item.id;
-                  item.label = item.label;
-                  delete item.id;
-                }
-              }
+          if (item.children) {
+            col.push({
+              value: item.id,
+              label: item.label,
+              children: this.changeObjFun(item.children),
+            });
+          } else {
+            col.push({
+              value: item.id,
+              label: item.label,
             });
           }
         });
-        // console.log(col)
         this.options = col;
       });
       listInvitation(this.queryParams).then((response) => {
@@ -730,6 +731,24 @@ export default {
         // this.fileList.length=0
         // this.fileList.push({'url':response.data.communityImg})
       });
+    },
+    changeObjFun(item) {
+      let col = [];
+      item.forEach((item, index) => {
+        if (item.children) {
+          col.push({
+            value: item.id,
+            label: item.label,
+            children: this.changeObjFun(item.children),
+          });
+        } else {
+          col.push({
+            value: item.id,
+            label: item.label,
+          });
+        }
+      });
+      return col;
     },
     // 帖子状态字典翻译
     commentsStatus(row, column) {

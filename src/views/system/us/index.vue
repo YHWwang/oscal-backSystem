@@ -62,10 +62,10 @@
 	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="usList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :default-sort = "{prop: 'date', order: 'descending'}" :data="usList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="订单号" align="center" prop="id" />
-      <el-table-column label="类型" align="center" prop="category" />
+      <el-table-column label="类型" sortable align="center" prop="category" />
       <el-table-column label="名称" align="center" prop="contractName" />
       <el-table-column label="邮箱" align="center" prop="email" />
       <el-table-column label="内容" align="center" prop="content" />

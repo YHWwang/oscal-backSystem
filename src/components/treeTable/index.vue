@@ -290,7 +290,6 @@ export default {
   },
   methods: {
     showAdvice(advice) {
-      //  this.$emit("kindList", advice);  无法回调数据，可能是由于kindList在组件直接没进行传值
       this.$emit("give-advice", advice);
     },
     headClass() {

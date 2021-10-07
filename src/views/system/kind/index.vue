@@ -315,7 +315,6 @@ export default {
   methods: {
     showAdvice(advice) {
       this.kindList = advice;
-      console.log(advice);
     },
     handleRemove(file, fileList) {
       this.form.categoryPic = [];
