@@ -9,7 +9,8 @@
     "build:prod": "vue-cli-service build",
     "build:stage": "vue-cli-service build --mode staging",
     "preview": "node build/index.js --preview",
-    "lint": "eslint --ext .js,.vue src"
+    "lint": "eslint --ext .js,.vue src",
+    "analyz": "NODE_ENV=production npm_config_report=true npm run build:prod"
   },
   "husky": {
     "hooks": {
@@ -64,17 +65,21 @@
     "@vue/cli-plugin-eslint": "4.4.6",
     "@vue/cli-service": "4.4.6",
     "babel-eslint": "10.1.0",
-    "chalk": "4.1.0",
+    "chalk": "^4.1.0",
     "connect": "3.6.6",
     "eslint": "7.15.0",
     "eslint-plugin-vue": "7.2.0",
     "lint-staged": "10.5.3",
+    "progress-bar-webpack-plugin": "^2.1.0",
     "runjs": "4.4.2",
     "sass": "1.32.0",
     "sass-loader": "10.1.0",
     "script-ext-html-webpack-plugin": "2.1.5",
     "svg-sprite-loader": "5.1.1",
-    "vue-template-compiler": "2.6.12"
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "vue-template-compiler": "2.6.12",
+    "webpack-bundle-analyzer": "^4.4.2",
+    "webpack-parallel-uglify-plugin": "^1.1.4"
   },
   "engines": {
     "node": ">=8.9",

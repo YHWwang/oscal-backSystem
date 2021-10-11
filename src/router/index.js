@@ -1,7 +1,7 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+// import Vue from 'vue'
+import VueRouter from 'vue-router'
 
-Vue.use(Router)
+// Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
@@ -121,7 +121,7 @@ export const constantRoutes = [
   }
 ]
 
-export default new Router({
+export default new VueRouter({
   mode: 'history', // 去掉url中的#
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
