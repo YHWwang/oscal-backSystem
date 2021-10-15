@@ -2,10 +2,12 @@
   <div>
     <el-table
       :id="name"
+      ref="tab"
       class="tabChlid"
       :data="kindList"
       style="width: 100%"
       :header-row-style="head"
+      @expand-change="expandChange" :expand-row-keys="expands" :row-key="getRowKeys"
     >
       <el-table-column type="expand">
         <template slot-scope="props">
@@ -17,7 +19,7 @@
           ></TreeTableName>
         </template>
       </el-table-column>
-      <el-table-column label="ID" align="center" prop="id" />
+      <el-table-column label="ID" align="center" prop="id" width='100'/>
       <!-- <el-table-column label="父id" align="center" prop="categoryPid" /> -->
       <el-table-column label="图标" show-overflow-tooltip align="center">
         <template slot-scope="scope">
@@ -213,6 +215,10 @@ export default {
   name: "TreeTableName",
   data() {
     return {
+      expands:[],
+      getRowKeys(row){
+        return row.id
+      },
       imgFile: [],
       imgUrl: process.env.VUE_APP_BASE_API + "/summernoteUpload",
       // 遮罩层
@@ -289,6 +295,23 @@ export default {
     });
   },
   methods: {
+    expandChange(row,expandedRows){
+      let that = this
+      console.log(row.children)
+      for (let key in row.children) {
+         if(row.children[key].children.length == 0){
+          
+       }
+      }
+      if(expandedRows.length){
+        that.expands=[]
+        if(row){
+          that.expands.push(row.id)
+        }
+      }else{
+        that.expands = []
+      }
+    },
     showAdvice(advice) {
       this.$emit("give-advice", advice);
     },
@@ -431,15 +454,22 @@ export default {
 
 <style>
 #tab1 table .el-table__body .el-table__expand-column {
-  padding-left: 32px;
+  padding-left: 24px;
 }
 #tab1 .tabChlid .tabChlid .el-table__expand-column {
   padding-left: 64px;
+}
+#tab1 .el-table [class*=el-table__row--level] .el-table__expand-icon{
+  width: auto;
 }
 #tab1 .tabChlid .tabChlid button:nth-child(1) {
   display: none;
 }
 #tab1 .tabChlid .tabChlid .el-table__expand-column .cell {
+  display: none;
+}
+
+.tabChlid .el-table__body .el-table__row td:nth-child(2) .el-table__expand-icon{
   display: none;
 }
 </style>

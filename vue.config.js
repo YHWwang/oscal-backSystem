@@ -2,7 +2,6 @@
 const path = require('path')
 const defaultSettings = require('./src/settings.js')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-// const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin')
 
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -47,53 +46,78 @@ module.exports = {
     },
     disableHostCheck: true
   },
-  configureWebpack: config=>{
+  configureWebpack: config => {
     config.externals = {
       vue: 'Vue',
       vuex: 'Vuex',
-      'vue-router':'VueRouter',
+      'vue-router': 'VueRouter',
       axios: 'axios',
       'element-ui': 'ELEMENT',
       echarts: 'echarts',
-
     }
     config.plugins.push(
       new UglifyJsPlugin({
         uglifyOptions: {
-            compress: {
-                drop_debugger: true,
-                drop_console: true,  //生产环境自动删除console
-            },
-            warnings: false,
+          compress: {
+            drop_debugger: true,
+            drop_console: true,  //生产环境自动删除console
+          },
+          warnings: false,
         },
         sourceMap: false,
         parallel: true,//使用多进程并行运行来提高构建速度。默认并发运行数：os.cpus().length - 1。
-    }),
-    // new ParallelUglifyPlugin({
-    //   cacheDir: '.cache/',
-    //   uglifyJS: {
-    //     output: {
-    //       comments: false
-    //     },
-    //     warnings: false,
-    //     compress: {
-    //       drop_debugger: true,
-    //       drop_console: false
-    //     }
-    //   }
-    // }),
-)
+      }),
+    )
+     // 公共代码抽离
+     config.optimization = {
+      splitChunks: {
+          cacheGroups: {
+              vendor: {
+                  chunks: 'all',
+                  test: /node_modules/,
+                  name: 'vendor',
+                  minChunks: 1,
+                  maxInitialRequests: 5,
+                  minSize: 0,
+                  priority: 100
+              },
+              common: {
+                  chunks: 'all',
+                  test: /[\\/]src[\\/]js[\\/]/,
+                  name: 'common',
+                  minChunks: 2,
+                  maxInitialRequests: 5,
+                  minSize: 0,
+                  priority: 60
+              },
+              styles: {
+                  name: 'styles',
+                  test: /\.(sa|sc|c)ss$/,
+                  chunks: 'all',
+                  enforce: true
+              },
+              runtimeChunk: {
+                  name: 'manifest'
+              }
+          }
+      }
+  }
   },
 
   chainWebpack(config) {
+    config.resolve.alias.set('@', resolve('src'))
+      .set('assets', resolve('src/assets'))
+      .set('components', resolve('src/components'))
     config.plugins.delete('preload') // TODO: need test
     config.plugins.delete('prefetch') // TODO: need test
     config.module
-    .rule('images')
+      .rule('images')
       .use('url-loader')
-        .loader('url-loader')
-        .tap(options => Object.assign(options, { limit: 10240 }))
-
+      .loader('url-loader')
+      .tap(options => Object.assign(options, { limit: 10240 })).end()
+      .use('image-webpack-loader').loader('image-webpack-loader').options({
+        bypassOnDebug: true
+      }).end()
     // set svg-sprite-loader
     config.module
       .rule('svg')
@@ -118,15 +142,15 @@ module.exports = {
             .plugin('ScriptExtHtmlWebpackPlugin')
             .after('html')
             .use('script-ext-html-webpack-plugin', [{
-            // `runtime` must same as runtimeChunk name. default is `runtime`
+              // `runtime` must same as runtimeChunk name. default is `runtime`
               inline: /runtime\..*\.js$/
             }])
             .end()
           config.plugin('progress-bar-webpack-plugin').use('progress-bar-webpack-plugin').end()
           config
-          .plugin('webpack-bundle-analyzer')
-          .use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin)
-          .end()
+            .plugin('webpack-bundle-analyzer')
+            .use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin)
+            .end()
           config
             .optimization.splitChunks({
               chunks: 'all',
@@ -153,8 +177,8 @@ module.exports = {
             })
           config.optimization.runtimeChunk('single'),
           {
-             from: path.resolve(__dirname, './public/robots.txt'), //防爬虫文件
-             to: './', //到根目录下
+            from: path.resolve(__dirname, './public/robots.txt'), //防爬虫文件
+            to: './', //到根目录下
           }
         }
       )
