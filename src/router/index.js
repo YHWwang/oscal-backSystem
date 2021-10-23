@@ -5,7 +5,6 @@ import VueRouter from 'vue-router'
 
 /* Layout */
 import Layout from '@/layout'
-import ParentView from '@/components/ParentView';
 
 /**
  * Note: 路由配置项

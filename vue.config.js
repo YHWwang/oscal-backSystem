@@ -34,10 +34,10 @@ module.exports = {
     proxy: {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
       [process.env.VUE_APP_BASE_API]: {
-        //http://3.121.224.63:8088---线上
+        //http://3.121.224.63:9088---线上
         //http://123.58.213.6:8088/---测试
-        //http://192.168.11.220:8088---本地
-        target: `http://123.58.213.6:8088`,
+        //http://192.168.11.220:9088---本地
+        target: `http://192.168.11.220:9088`,
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''
