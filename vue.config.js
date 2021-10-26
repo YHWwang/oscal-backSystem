@@ -37,7 +37,7 @@ module.exports = {
         //http://3.121.224.63:9088---线上
         //http://123.58.213.6:8088/---测试
         //http://192.168.11.220:9088---本地
-        target: `http://192.168.11.220:9088`,
+        target: `http://3.65.38.242:9088`,
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''
@@ -48,12 +48,12 @@ module.exports = {
   },
   configureWebpack: config => {
     config.externals = {
-      vue: 'Vue',
-      vuex: 'Vuex',
-      'vue-router': 'VueRouter',
-      axios: 'axios',
-      'element-ui': 'ELEMENT',
-      echarts: 'echarts',
+      // vue: 'Vue',
+      // vuex: 'Vuex',
+      // 'vue-router': 'VueRouter',
+      // axios: 'axios',
+      // 'element-ui': 'ELEMENT',
+      // echarts: 'echarts',
     }
     config.plugins.push(
       new UglifyJsPlugin({
@@ -69,39 +69,39 @@ module.exports = {
       }),
     )
      // 公共代码抽离
-     config.optimization = {
-      splitChunks: {
-          cacheGroups: {
-              vendor: {
-                  chunks: 'all',
-                  test: /node_modules/,
-                  name: 'vendor',
-                  minChunks: 1,
-                  maxInitialRequests: 5,
-                  minSize: 0,
-                  priority: 100
-              },
-              common: {
-                  chunks: 'all',
-                  test: /[\\/]src[\\/]js[\\/]/,
-                  name: 'common',
-                  minChunks: 2,
-                  maxInitialRequests: 5,
-                  minSize: 0,
-                  priority: 60
-              },
-              styles: {
-                  name: 'styles',
-                  test: /\.(sa|sc|c)ss$/,
-                  chunks: 'all',
-                  enforce: true
-              },
-              runtimeChunk: {
-                  name: 'manifest'
-              }
-          }
-      }
-  }
+  //    config.optimization = {
+  //     splitChunks: {
+  //         cacheGroups: {
+  //             vendor: {
+  //                 chunks: 'all',
+  //                 test: /node_modules/,
+  //                 name: 'vendor',
+  //                 minChunks: 1,
+  //                 maxInitialRequests: 5,
+  //                 minSize: 0,
+  //                 priority: 100
+  //             },
+  //             common: {
+  //                 chunks: 'all',
+  //                 test: /[\\/]src[\\/]js[\\/]/,
+  //                 name: 'common',
+  //                 minChunks: 2,
+  //                 maxInitialRequests: 5,
+  //                 minSize: 0,
+  //                 priority: 60
+  //             },
+  //             styles: {
+  //                 name: 'styles',
+  //                 test: /\.(sa|sc|c)ss$/,
+  //                 chunks: 'all',
+  //                 enforce: true
+  //             },
+  //             runtimeChunk: {
+  //                 name: 'manifest'
+  //             }
+  //         }
+  //     }
+  // }
   },
 
   chainWebpack(config) {
