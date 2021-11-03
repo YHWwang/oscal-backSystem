@@ -1,7 +1,7 @@
 'use strict'
 const path = require('path')
 const defaultSettings = require('./src/settings.js')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -35,9 +35,9 @@ module.exports = {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
       [process.env.VUE_APP_BASE_API]: {
         //http://3.121.224.63:9088---线上
-        //http://123.58.213.6:8088/---测试
-        //http://192.168.11.220:9088---本地
-        target: `http://3.65.38.242:9088`,
+        //http://123.58.213.6:9068/---测试
+        //http://192.168.11.220:9078---本地
+        target: `http://123.58.213.6:9068`,
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''
@@ -55,19 +55,19 @@ module.exports = {
       // 'element-ui': 'ELEMENT',
       // echarts: 'echarts',
     }
-    config.plugins.push(
-      new UglifyJsPlugin({
-        uglifyOptions: {
-          compress: {
-            drop_debugger: true,
-            drop_console: true,  //生产环境自动删除console
-          },
-          warnings: false,
-        },
-        sourceMap: false,
-        parallel: true,//使用多进程并行运行来提高构建速度。默认并发运行数：os.cpus().length - 1。
-      }),
-    )
+    // config.plugins.push(
+    //   new UglifyJsPlugin({
+    //     uglifyOptions: {
+    //       compress: {
+    //         drop_debugger: true,
+    //         drop_console: true,  //生产环境自动删除console
+    //       },
+    //       warnings: false,
+    //     },
+    //     sourceMap: false,
+    //     parallel: true,//使用多进程并行运行来提高构建速度。默认并发运行数：os.cpus().length - 1。
+    //   }),
+    // )
      // 公共代码抽离
   //    config.optimization = {
   //     splitChunks: {

@@ -666,8 +666,8 @@ export default {
       let imgWidth = "";
       let imgHight = "";
       const isSize = new Promise(function (resolve, reject) {
-        let width = 812;
-        let height = 450;
+        let width = 818;
+        let height = 445;
         let _URL = window.URL || window.webkitURL;
         let img = new Image();
         img.onload = function () {
@@ -684,7 +684,7 @@ export default {
         () => {
           _this.$message.warning({
             message:
-              "上传文件的图片大小不合符标准,宽需要为812px，高需要为450px。当前上传图片的宽高分别为：" +
+              "上传文件的图片大小不合符标准,宽需要为818px，高需要为445px。当前上传图片的宽高分别为：" +
               imgWidth +
               "px和" +
               imgHight +

@@ -161,6 +161,9 @@
             >
           </el-radio-group>
         </el-form-item>
+         <el-form-item label="路由地址" prop="hoverPic">
+          <el-input v-model="form.hoverPic" placeholder="请输入路由地址" />
+        </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input v-model="form.sort" placeholder="请输入排序" />
         </el-form-item>
@@ -242,6 +245,8 @@ export default {
         pid: null,
         cateName: null,
         sort: null,
+        beginTime:null,
+        endTime:null,
         pic: null,
         isShow: null,
         addTime: null,
@@ -254,6 +259,9 @@ export default {
         // pid: [{ required: true, message: "父id不能为空", trigger: "blur" }],
         cateName: [
           { required: true, message: "分类名称不能为空", trigger: "blur" },
+        ],
+        hoverPic: [
+          { required: true, message: "路由地址不能为空", trigger: "blur" },
         ],
         isShow: [
           { required: true, message: "展示状态不能为空", trigger: "blur" },
@@ -318,6 +326,7 @@ export default {
       this.form = {
         id: null,
         pid: null,
+        hoverPic:null,
         cateName: null,
         sort: null,
         pic: null,
