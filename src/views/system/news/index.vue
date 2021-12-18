@@ -162,8 +162,8 @@
     />
 
     <!-- 添加或修改新闻对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="新闻图片">
           <!-- <el-input v-model="form.newsImg" placeholder="请输入新闻图片" /> -->
            <el-upload
@@ -208,6 +208,15 @@
         </el-form-item>
         <el-form-item label="新闻排序" prop="newsSort">
           <el-input v-model="form.newsSort" placeholder="请输入新闻排序" />
+        </el-form-item>
+         <el-form-item label="seo-title" prop="newsTdkTitle">
+          <el-input v-model="form.newsTdkTitle" placeholder="" />
+        </el-form-item>
+         <el-form-item label="seo-descript" prop="newsTdkDes">
+          <el-input v-model="form.newsTdkDes" placeholder="" />
+        </el-form-item>
+         <el-form-item label="seo-keywords" prop="newsTdkKeywords">
+          <el-input v-model="form.newsTdkKeywords" placeholder="" />
         </el-form-item>
         <el-form-item label="简要描述" prop="newsSimDes">
           <el-input v-model="form.newsSimDes" placeholder="请输入简要描述" />

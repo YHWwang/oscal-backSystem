@@ -324,6 +324,15 @@
             placeholder="请输入规格书"
           />
         </el-form-item>
+        <el-form-item label="seo-title" prop="seoTitle">
+          <el-input v-model="form.seoTitle" placeholder="" />
+        </el-form-item>
+         <el-form-item label="seo-descript" prop="seoKeywords">
+          <el-input v-model="form.seoKeywords" placeholder="" />
+        </el-form-item>
+         <el-form-item label="seo-keywords" prop="productRepresent">
+          <el-input v-model="form.productRepresent" placeholder="" />
+        </el-form-item>
         <!-- <el-form-item label="是否删除(0：未删除，1：删除)" prop="isDel">
           <el-input v-model="form.isDel" placeholder="请输入是否删除(0：未删除，1：删除)" />
         </el-form-item>

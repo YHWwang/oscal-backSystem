@@ -20,7 +20,8 @@
         width=""
         prop="topTitle"
       ></el-table-column>
-      <el-table-column label="分类ID" width="" prop="tdkId"></el-table-column>
+      <el-table-column label="模块名称" width="" prop="value1" sortable></el-table-column>
+       <el-table-column label="分类名称" width="" prop="value2" sortable></el-table-column>
       <el-table-column
         label="TDK-标题"
         width=""
@@ -126,18 +127,9 @@ export default {
       title: "",
       form: {},
       rules: {
-        tdkDescribe: [
-          { required: true, message: "描述不能为空", trigger: "blur" },
-        ],
         tdkId: [
           { required: true, message: "tdk分类id不能为空", trigger: "blur" },
-        ],
-        tdkKeywords: [
-          { required: true, message: "关键字不能为空", trigger: "blur" },
-        ],
-        tdkTitle: [
-          { required: true, message: "标题不能为空", trigger: "blur" },
-        ],
+        ]
       },
       loading: false,
       open: false,

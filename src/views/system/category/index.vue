@@ -75,15 +75,15 @@
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="商品分类表ID" align="center" prop="id" />
-         <el-table-column label="图标" align="center">
-            <template slot-scope="scope">
+      <el-table-column label="图标" align="center">
+        <template slot-scope="scope">
           <el-image
             style="width: 100px; height: 100px"
             :src="scope.row.pic"
-            fit='scale-down'
+            fit="scale-down"
           ></el-image>
         </template>
-         </el-table-column>
+      </el-table-column>
       <el-table-column label="分类名称" align="center" prop="cateName" />
       <el-table-column
         label="展示状态"
@@ -137,7 +137,7 @@
 
     <!-- 添加或修改商品分类对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <!-- <el-form-item label="父id" prop="pid">
           <el-select v-model="form.pid" placeholder="请选择产品类别">
              <el-option
@@ -161,14 +161,14 @@
             >
           </el-radio-group>
         </el-form-item>
-         <el-form-item label="路由地址" prop="hoverPic">
+        <el-form-item label="路由地址" prop="hoverPic">
           <el-input v-model="form.hoverPic" placeholder="请输入路由地址" />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input v-model="form.sort" placeholder="请输入排序" />
         </el-form-item>
         <el-form-item label="请上传图标">
-           <el-upload
+          <el-upload
             class="upload-demo"
             :action="imgUrl"
             :on-success="handleSuccess"
@@ -188,6 +188,15 @@
             type="textarea"
             placeholder="请输入图标地址"
           /> -->
+        </el-form-item>
+         <el-form-item label="seo-title" prop="categoryTitle">
+          <el-input v-model="form.categoryTitle" />
+        </el-form-item>
+        <el-form-item label="seo-describe" prop="categoryDes">
+          <el-input v-model="form.categoryDes" />
+        </el-form-item>
+        <el-form-item label="seo-keywords" prop="categoryKeywords">
+          <el-input v-model="form.categoryKeywords" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -245,8 +254,8 @@ export default {
         pid: null,
         cateName: null,
         sort: null,
-        beginTime:null,
-        endTime:null,
+        beginTime: null,
+        endTime: null,
         pic: null,
         isShow: null,
         addTime: null,
@@ -269,6 +278,20 @@ export default {
       },
     };
   },
+  watch: {
+    "form.hoverPic"(newVal, oldVal) {
+      function stripscript(value) {
+        var str = "";
+        str = value.replace(/[^a-zA-Z0-9]+/gi, "-").toLowerCase(); // 正则去除非字母外的其他字符
+        str = str.startsWith("-") ? str.substring(1) : str; // 去除首“-”
+        str = str.endsWith("-") ? str.substring(0, str.length - 1) : str; // 去除尾“-”
+        return str;
+      }
+      if (newVal) {
+        this.form.hoverPic = stripscript(newVal);
+      }
+    },
+  },
   created() {
     this.getList();
     this.getDicts("sys_banner_show").then((response) => {
@@ -279,7 +302,7 @@ export default {
     statusFormat(row, column) {
       return this.selectDictLabel(this.showOptions, row.isShow);
     },
-  handleRemove(file, fileList) {
+    handleRemove(file, fileList) {
       this.form.pic = [];
       this.imgFile = [];
       console.log(file, fileList);
@@ -304,8 +327,8 @@ export default {
     /** 查询商品分类列表 */
     getList() {
       this.loading = true;
-      getCategoryList().then(res => {
-          this.cateNameList = res.data.categoryList
+      getCategoryList().then((res) => {
+        this.cateNameList = res.data.categoryList;
       });
       listCategory(this.addDateRange(this.queryParams, this.dateRange)).then(
         (response) => {
@@ -322,11 +345,11 @@ export default {
     },
     // 表单重置
     reset() {
-      this.imgFile = []
+      this.imgFile = [];
       this.form = {
         id: null,
         pid: null,
-        hoverPic:null,
+        hoverPic: null,
         cateName: null,
         sort: null,
         pic: null,
@@ -365,10 +388,7 @@ export default {
       const id = row.id || this.ids;
       getCategory(id).then((response) => {
         this.form = response.data;
-         this.imgFile.push(
-          {'url':response.data.pic,
-          'name':'Image'}
-          ) 
+        this.imgFile.push({ url: response.data.pic, name: "Image" });
         this.open = true;
         this.title = "修改商品分类";
       });
@@ -433,7 +453,7 @@ export default {
 </script>
 
 <style>
-.el-upload-list--picture .el-upload-list__item{
+.el-upload-list--picture .el-upload-list__item {
   transition: all 0s;
 }
 </style>
