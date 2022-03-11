@@ -241,7 +241,9 @@
             />
           </el-select>
         </el-form-item>
-
+        <el-form-item label="文件名" prop="fileIndex">
+          <el-input v-model="form.fileIndex" placeholder="请输入文件名" />
+        </el-form-item>
         <!-- <el-form-item label="关键字" prop="keyword">
           <el-input v-model="form.keyword" placeholder="请输入关键字" />
         </el-form-item>
@@ -263,9 +265,7 @@
         <el-form-item label="邮费" prop="postage">
           <el-input v-model="form.postage" placeholder="请输入邮费" />
         </el-form-item>
-        <el-form-item label="文件名" prop="unitName">
-          <el-input v-model="form.unitName" placeholder="请输入文件名" />
-        </el-form-item>
+      
         <el-form-item label="排序" prop="sort">
           <el-input v-model="form.sort" placeholder="请输入排序" />
         </el-form-item>
@@ -304,9 +304,9 @@
             >
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="产品购买链接" prop="soureLink">
+        <!-- <el-form-item label="产品购买链接" prop="soureLink">
           <el-input v-model="form.soureLink" placeholder="请输入产品购买链接" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="跳转url" prop="productUrl">
           <el-input v-model="form.productUrl" placeholder="请输入跳转url" />
         </el-form-item>
@@ -464,7 +464,7 @@ export default {
         vipPrice: null,
         otPrice: null,
         postage: null,
-        unitName: null,
+        fileIndex: null,
         sort: null,
         sales: null,
         stock: null,
@@ -508,9 +508,9 @@ export default {
         storeName: [
           { required: true, message: "商品名称不能为空", trigger: "blur" },
         ],
-        // sliderImage: [
-        //   { required: true, message: "轮播图不能为空", trigger: "blur" },
-        // ],
+        fileIndex: [
+          { required: true, message: "文件命不能为空", trigger: "blur" },
+        ],
         cateId: [
           { required: true, message: "产品类别不能为空", trigger: "blur" },
         ],
@@ -602,7 +602,7 @@ export default {
         vipPrice: null,
         otPrice: null,
         postage: null,
-        unitName: null,
+        fileIndex: null,
         sort: null,
         sales: null,
         stock: null,

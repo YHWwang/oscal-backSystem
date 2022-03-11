@@ -1,5 +1,21 @@
 import request from '@/utils/request'
 
+// 查询标签列表
+export function getLabels() {
+  return request({
+    url: '/system/label/getLabels',
+    method: 'get',
+  })
+}
+
+// 置顶
+export function changeTop(data) {
+  return request({
+    url: '/system/invitation/changeTop',
+    method: 'post',
+    data: data
+  })
+}
 // 查询帖子列表
 export function listInvitation(query) {
   return request({

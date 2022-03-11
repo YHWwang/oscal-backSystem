@@ -37,7 +37,7 @@
       />
       <el-table-column label="排序" align="center" prop="categorySort" />
       <el-table-column
-        label="是否属于板块"
+        label="是否帖子类型"
         align="center"
         prop="isOs"
         :formatter="isOsStatus"
@@ -48,26 +48,6 @@
         prop="categoryIsShow"
         :formatter="postCategoryStatus"
       />
-      <el-table-column
-        label="添加时间"
-        align="center"
-        prop="addTime"
-        width="180"
-      >
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.addTime, "{y}-{m}-{d}") }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="修改时间"
-        align="center"
-        prop="upTime"
-        width="180"
-      >
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.upTime, "{y}-{m}-{d}") }}</span>
-        </template>
-      </el-table-column>
       <el-table-column
         label="操作"
         width="200"
@@ -141,10 +121,10 @@
           /> -->
         </el-form-item>
 
-        <el-form-item label="是否属于板块" prop="isOs">
+        <el-form-item label="是否帖子类型" prop="isOs">
           <el-select
             v-model="form.isOs"
-            placeholder="请输入是否推荐0不显示1显示"
+            placeholder="请选择"
             clearable
             size="small"
           >
@@ -159,7 +139,7 @@
         <el-form-item label="是否显示" prop="categoryIsShow">
           <el-select
             v-model="form.categoryIsShow"
-            placeholder="请输入是否推荐0不显示1显示"
+            placeholder="请选择"
             clearable
             size="small"
           >

@@ -16,10 +16,10 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="1新发2热门3精华4所有" prop="communityType">
+      <el-form-item label="2热门3精华4普通" prop="communityType">
         <el-select
           v-model="queryParams.communityType"
-          placeholder="请选择1新发2热门3精华4所有"
+          placeholder="请选择2热门3精华4普通"
           clearable
           size="small"
         >
@@ -31,7 +31,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="是否属于板块" prop="osType">
+      <!-- <el-form-item label="是否属于板块" prop="osType">
         <el-select
           v-model="queryParams.osType"
           placeholder="请选择"
@@ -45,7 +45,7 @@
             :value="dict.dictValue"
           />
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="是否首页推荐" prop="isHomeIndex">
         <el-select
           v-model="queryParams.isHomeIndex"
@@ -262,17 +262,18 @@
       @selection-change="handleSelectionChange"
       :default-sort="{ prop: 'date', order: 'descending' }"
     >
-      <el-table-column type="selection" width="55" align="center" />
+      <!-- <el-table-column type="selection" width="55" align="center" /> -->
       <el-table-column label="帖子编号" align="center" prop="id" />
       <el-table-column label="用户id" align="center" prop="userId" />
       <el-table-column
-        label="1新发2热门3精华4所有"
+        label="2热门3精华4普通"
         align="center"
         sortable
         prop="communityType"
         :formatter="postsStatus"
+        width="150"
       />
-      <el-table-column label="帖子封面" show-overflow-tooltip align="center">
+      <el-table-column label="帖子封面" align="center">
         <template slot-scope="scope">
           <el-image
             style="width: 100px; height: 100px"
@@ -295,13 +296,14 @@
         sortable
         :formatter="isHomeStatus"
       />
-      <el-table-column
+      <!-- <el-table-column
         label="是否属于板块"
         align="center"
         sortable
         prop="osType"
         :formatter="isOsStatus"
-      />
+        width="125"
+      /> -->
       <el-table-column
         label="点赞数"
         align="center"
@@ -327,10 +329,10 @@
         width="120"
       >
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.communityCre, "{y}-{m}-{d}") }}</span>
+          <span>{{ formatMoment(scope.row.communityCre) }}</span>
         </template>
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         label="修改时间"
         align="center"
         prop="communityUp"
@@ -339,8 +341,20 @@
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.communityUp, "{y}-{m}-{d}") }}</span>
         </template>
+      </el-table-column> -->
+      <el-table-column label="置顶状态" align="center" prop="isTop">
+        <template slot-scope="scope">
+          <el-tag
+            v-if="scope.row.isTop"
+            @click="changeTopStatus(scope.row.id, 0)"
+            type="success"
+            >已置顶</el-tag
+          >
+          <el-tag v-else @click="changeTopStatus(scope.row.id, 1)" type="info"
+            >未置顶</el-tag
+          >
+        </template>
       </el-table-column>
-      <!-- <el-table-column label="排序" align="center" prop="communitySort" /> -->
 
       <!-- <el-table-column label="简述" align="center" prop="communityName" /> -->
       <!-- <el-table-column label="是否是新发帖0不是1是" align="center" prop="communityNew" />
@@ -388,16 +402,16 @@
         <!-- <el-form-item label="用户id" prop="userId">
           <el-input v-model="form.userId" placeholder="请输入用户id" />
         </el-form-item> -->
-        <el-form-item label="1新发2热门3精华4所有" prop="communityType">
+        <el-form-item label="2热门3精华4普通" prop="communityType">
           <el-select
             v-model="form.communityType"
-            placeholder="请选择1新发2热门3精华4所有"
+            placeholder="请选择2热门3精华4普通"
           >
             <el-option
               v-for="dict in postSortOptions"
               :key="dict.dictValue"
               :label="dict.dictLabel"
-              :value="dict.dictValue"
+              :value="dict.dictSort"
             />
           </el-select>
         </el-form-item>
@@ -482,11 +496,11 @@
               v-for="dict in isHomeOptions"
               :key="dict.dictValue"
               :label="dict.dictLabel"
-              :value="dict.dictValue"
+              :value="dict.dictSort"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="是否属于板块" prop="osType">
+        <!-- <el-form-item label="是否属于板块" prop="osType">
           <el-select
             v-model="form.osType"
             placeholder="0不是1是"
@@ -500,6 +514,16 @@
               :value="dict.dictValue"
             />
           </el-select>
+        </el-form-item> -->
+        <el-form-item label="标签" prop="labels">
+          <el-checkbox-group v-model="checkedCities">
+            <el-checkbox
+              v-for="item in labels"
+              :label="item.label"
+              :key="item.id"
+              >{{ item.label }}</el-checkbox
+            >
+          </el-checkbox-group>
         </el-form-item>
         <el-form-item label="简述" prop="communityName">
           <el-input v-model="form.communityName" placeholder="请输入简述" />
@@ -541,6 +565,8 @@ import {
   exportInvitation,
   sysAuditFun,
   sysAuditDelFun,
+  getLabels,
+  changeTop,
 } from "@/api/system/invitation";
 import Editor from "@/components/Editor";
 
@@ -552,6 +578,8 @@ export default {
       imgFile: [],
       url: process.env.VUE_APP_BASE_API + "/summernoteUpload",
       imgUrl: process.env.VUE_APP_BASE_API + "/summernoteUpload",
+      checkedCities: [],
+      labels: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -594,6 +622,8 @@ export default {
         communityHot: null,
         communityBetter: null,
         communityStatus: null,
+        labels: "",
+        isTop: null,
       },
       selectPostData: "",
       // 表单参数
@@ -620,14 +650,12 @@ export default {
         isHomeIndex: [
           { required: true, message: "是否首页推荐不能为空", trigger: "blur" },
         ],
-        osType: [
-          { required: true, message: "是否属于板块不能为空", trigger: "blur" },
-        ],
       },
     };
   },
   created() {
     this.getList();
+    this.getLabelsFn();
     this.getDicts("sys_comment_show").then((response) => {
       this.commentOptions = response.data;
     });
@@ -642,6 +670,21 @@ export default {
     });
   },
   methods: {
+    formatMoment(data){
+       return this.$config(data).format("YYYY-MM-DD")
+    },
+    getLabelsFn() {
+      //查询标签列表
+      getLabels().then((res) => {
+        res.data.forEach((item) => {
+          this.labels.push({
+            id: item.id,
+            label: item.labelName,
+          });
+        });
+      });
+    },
+
     handleRemove(file, fileList) {
       this.form.communityImg = [];
       this.imgFile = [];
@@ -786,6 +829,7 @@ export default {
     // 表单重置
     reset() {
       this.imgFile = [];
+      this.checkedCities = [];
       this.form = {
         id: null,
         userId: null,
@@ -807,6 +851,8 @@ export default {
         communityHot: null,
         communityBetter: null,
         communityStatus: 0,
+        labels: "",
+        isTop: null,
       };
       this.resetForm("form");
     },
@@ -837,11 +883,48 @@ export default {
       this.open = true;
       this.title = "添加帖子";
     },
+    changeTopStatus(id, status) {
+      let format = {
+        id: id,
+        isTop: status,
+      };
+      this.$confirm("此操作将切换置顶状态, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          changeTop(format).then(() => {
+            this.$message({
+              type: "success",
+              message: "切换成功!",
+            });
+            this.getList();
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消",
+          });
+        });
+    },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids;
       getInvitation(id).then((response) => {
+        if (response.data.labels) {
+          let labelList = response.data.labels.split(",");
+          for (const id of labelList) {
+            for (const iterator of this.labels) {
+              if (id == iterator.id) {
+                this.checkedCities.push(iterator.label);
+                break;
+              }
+            }
+          }
+        }
         this.form = response.data;
         this.imgFile.push({ url: response.data.communityImg, name: "Image" });
         this.postID = response.data.oscalCommentCategoryId;
@@ -865,6 +948,15 @@ export default {
               return false;
             }
           }
+          let labelsList = "";
+          this.checkedCities.forEach((item) => {
+            for (const key of this.labels) {
+              if (key.label == item) {
+                labelsList += key.id + ",";
+              }
+            }
+          });
+          this.form.labels = labelsList.slice(0, labelsList.length - 1);
           // console.log(this.form);
           if (this.form.oscalCommentCategoryId.length >= 1) {
             let len = this.form.oscalCommentCategoryId.pop();
@@ -925,5 +1017,23 @@ export default {
 <style>
 .el-upload-list--picture .el-upload-list__item {
   transition: all 0s;
+}
+.cell .el-tag {
+  cursor: pointer;
+}
+.el-tag + .el-tag {
+  margin-left: 10px;
+}
+.button-new-tag {
+  margin-left: 10px;
+  height: 32px;
+  line-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.input-new-tag {
+  width: 90px;
+  margin-left: 10px;
+  vertical-align: bottom;
 }
 </style>

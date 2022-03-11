@@ -189,6 +189,9 @@
             placeholder="请输入图标地址"
           /> -->
         </el-form-item>
+         <el-form-item label="封面跳转地址" prop="toUrl">
+          <el-input v-model="form.toUrl" />
+        </el-form-item>
          <el-form-item label="seo-title" prop="categoryTitle">
           <el-input v-model="form.categoryTitle" />
         </el-form-item>
@@ -252,6 +255,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         pid: null,
+        toUrl:null,
         cateName: null,
         sort: null,
         beginTime: null,
@@ -265,7 +269,7 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        // pid: [{ required: true, message: "父id不能为空", trigger: "blur" }],
+        toUrl: [{ required: true, message: "跳转链接不能为空", trigger: "blur" }],
         cateName: [
           { required: true, message: "分类名称不能为空", trigger: "blur" },
         ],
@@ -351,6 +355,7 @@ export default {
         pid: null,
         hoverPic: null,
         cateName: null,
+        toUrl:null,
         sort: null,
         pic: null,
         isShow: null,

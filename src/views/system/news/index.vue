@@ -104,7 +104,7 @@
       :data="newsList"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="55" align="center" />
+      <!-- <el-table-column type="selection" width="55" align="center" /> -->
       <el-table-column label="序号" align="center" prop="id" />
       <el-table-column label="封面图片" align="center">
          <template slot-scope="scope">

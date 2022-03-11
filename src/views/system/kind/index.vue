@@ -37,7 +37,7 @@
       <el-form-item label="是否显示" prop="categoryIsShow">
         <el-select
           v-model="queryParams.categoryIsShow"
-          placeholder="请输入是否推荐0不显示1显示"
+          placeholder="请选择"
           clearable
           size="small"
         >
@@ -49,10 +49,10 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="是否属于板块" prop="isOs">
+      <el-form-item label="是否帖子类型" prop="isOs">
         <el-select
           v-model="queryParams.isOs"
-          placeholder="请选择属于1不属于0"
+          placeholder="请选择"
           clearable
           size="small"
         >
@@ -63,18 +63,6 @@
             :value="dict.dictValue"
           />
         </el-select>
-      </el-form-item>
-      <el-form-item label="添加时间" prop="addTime">
-        <el-date-picker
-          clearable
-          size="small"
-          style="width: 200px"
-          v-model="queryParams.addTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择添加时间"
-        >
-        </el-date-picker>
       </el-form-item>
       <!-- <el-form-item label="添加时间" prop="categoryHoverPic">
         <el-input
@@ -177,10 +165,10 @@
           /> -->
         </el-form-item>
 
-        <el-form-item label="是否属于板块" prop="isOs">
+        <el-form-item label="是否帖子类型" prop="isOs">
           <el-select
             v-model="form.isOs"
-            placeholder="请输入是否推荐0不显示1显示"
+            placeholder="请输入"
             clearable
             size="small"
           >
