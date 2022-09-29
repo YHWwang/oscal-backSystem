@@ -31,7 +31,7 @@
       </el-form-item> -->
 
       <el-form-item label="是否签到" prop="isSign">
-         <el-select v-model="queryParams.isSign" placeholder="是否签到0没有签到1签到" clearable size="small">
+         <el-select v-model="queryParams.isSign" placeholder="是否签到" clearable size="small">
             <el-option
             v-for="dict in signedOptions"
             :key="dict.dictValue"

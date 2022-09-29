@@ -113,20 +113,22 @@
     <el-table
       v-loading="loading"
       :data="productList"
-      :default-sort = "{prop: 'date', order: 'descending'}"
+      :default-sort="{ prop: 'date', order: 'descending' }"
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="商品id" align="center" prop="id" />
       <el-table-column label="商品图片" align="center">
         <template slot-scope="scope">
-          <el-image
-            style="width: 50px; height: 50px"
-            :src="scope.row.image"
-            fit="scale-down"
-            @click="imgClick(scope.row.image)"
-            :preview-src-list="srcList"
-          ></el-image>
+          <a
+            :href="formatImg(scope.row.image)"
+            style="color: #42b983"
+            target="_blank"
+            ><img
+              :src="formatImg(scope.row.image)"
+              alt="点击打开"
+              class="el-avatar"
+          /></a>
         </template>
       </el-table-column>
       <el-table-column label="商品名称" align="center" prop="storeName" />
@@ -198,8 +200,8 @@
     />
 
     <!-- 添加或修改商品对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="130px">
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <!-- <el-form-item label="商户Id" prop="merId">
           <el-input
             v-model="form.merId"
@@ -207,38 +209,68 @@
           />
         </el-form-item> -->
         <el-form-item label="商品图片" prop="image">
-          <el-upload
-            class="upload-demo"
-            :action="imgUrl"
-            :on-success="handleSuccess"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            :before-remove="beforeRemove"
-            multiple
-            list-type="picture"
-            :limit="1"
-            :file-list="imgFile"
-            :on-exceed="handleExceed"
-          >
-            <el-button size="small" type="primary">点击上传</el-button>
-          </el-upload>
-          <!-- <el-input v-model="form.image" placeholder="请输入商品图片" /> -->
+          <picUpload
+            v-model="form.image"
+            :num="4"
+            :pw="1200"
+            :ph="1200"
+          ></picUpload>
         </el-form-item>
-
+        <el-form-item label="pc产品封面图" prop="hotImage">
+          <picUpload v-model="form.hotImage" :num="1"></picUpload>
+          <p>
+            C系列首第一张：590*660，其它590*320；S系列386*560；Pad系列590*660
+          </p>
+        </el-form-item>
+        <el-form-item label="app产品封面图" prop="sliderImage">
+          <picUpload
+            v-model="form.sliderImage"
+            :num="1"
+            :pw="750"
+            :ph="750"
+          ></picUpload>
+        </el-form-item>
         <el-form-item label="商品名称" prop="storeName">
           <el-input v-model="form.storeName" placeholder="请输入商品名称" />
         </el-form-item>
         <el-form-item label="商品简介" prop="storeInfo">
           <el-input v-model="form.storeInfo" placeholder="请输入商品简介" />
         </el-form-item>
-        <el-form-item label="产品类别" prop="cateId">
-          <el-select v-model="form.cateId" placeholder="请选择产品类别">
-            <el-option
-              v-for="(dict, index) in cateNameList"
-              :key="index"
-              :label="dict.cate_name"
-              :value="dict.id"
-            />
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="产品类别" prop="cateId">
+              <el-select
+                v-model="form.cateId"
+                @change="changeCateId"
+                placeholder="请选择产品类别"
+              >
+                <el-option
+                  v-for="dict in cateNameList"
+                  :key="dict.id"
+                  :label="dict.cate_name"
+                  :value="dict.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="产品系列" prop="seriesId">
+              <el-select v-model="form.seriesId" placeholder="请选择产品系列">
+                <el-option
+                  v-for="res in seriesList"
+                  :key="res.id"
+                  :label="res.name"
+                  :value="res.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="产品标签" prop="status">
+          <el-select v-model="form.status" placeholder="请选择产品标签">
+            <el-option :key="0" label="普通" :value="0" />
+            <el-option :key="1" label="新发" :value="1" />
+            <el-option :key="2" label="热门" :value="2" />
           </el-select>
         </el-form-item>
         <el-form-item label="文件名" prop="fileIndex">
@@ -304,12 +336,12 @@
             >
           </el-radio-group>
         </el-form-item>
-        <!-- <el-form-item label="产品购买链接" prop="soureLink">
+        <el-form-item label="产品购买链接" prop="soureLink">
           <el-input v-model="form.soureLink" placeholder="请输入产品购买链接" />
-        </el-form-item> -->
-        <el-form-item label="跳转url" prop="productUrl">
-          <el-input v-model="form.productUrl" placeholder="请输入跳转url" />
         </el-form-item>
+        <!-- <el-form-item label="跳转url" prop="productUrl">
+          <el-input v-model="form.productUrl" placeholder="请输入跳转url" />
+        </el-form-item> -->
         <el-form-item label="产品描述" prop="description">
           <el-input
             type="textarea"
@@ -324,13 +356,16 @@
             placeholder="请输入规格书"
           />
         </el-form-item>
+        <el-form-item label="排序" prop="sort">
+          <el-input type="text" v-model="form.sort" placeholder="请输入排序" />
+        </el-form-item>
         <el-form-item label="seo-title" prop="seoTitle">
           <el-input v-model="form.seoTitle" placeholder="" />
         </el-form-item>
-         <el-form-item label="seo-descript" prop="seoKeywords">
+        <el-form-item label="seo-descript" prop="seoKeywords">
           <el-input v-model="form.seoKeywords" placeholder="" />
         </el-form-item>
-         <el-form-item label="seo-keywords" prop="productRepresent">
+        <el-form-item label="seo-keywords" prop="productRepresent">
           <el-input v-model="form.productRepresent" placeholder="" />
         </el-form-item>
         <!-- <el-form-item label="是否删除(0：未删除，1：删除)" prop="isDel">
@@ -364,9 +399,7 @@
           <el-input v-model="form.codePath" placeholder="请输入产品二维码地址(用户小程序海报)" />
         </el-form-item>
       
-        <el-form-item label="首页hot图片" prop="hotImage">
-          <el-input v-model="form.hotImage" placeholder="请输入首页hot图片" />
-        </el-form-item>
+      
        
       
         <el-form-item label="关联的商品id集合" prop="recommond">
@@ -412,17 +445,15 @@ import {
   updateProduct,
   getCategoryList,
   exportProduct,
+  getSeries,
 } from "@/api/system/product";
-
+import picUpload from "@/components/pic-upload/indexupload";
 export default {
   name: "Product",
+  components: { picUpload },
   data() {
     return {
-      imgFile: [],
-      srcList: [
-        "https://d2kbvjszk9d5ln.cloudfront.net/yshop/upload/pic/c20-20210805071240485.png",
-      ],
-      imgUrl: process.env.VUE_APP_BASE_API + "/summernoteUpload",
+      seriesList: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -454,7 +485,7 @@ export default {
         storeName: null,
         id: null,
         merId: null,
-        image: null,
+        image: [],
         sliderImage: null,
         storeInfo: null,
         keyword: null,
@@ -496,6 +527,8 @@ export default {
         productTitle: null,
         productRepresent: null,
         productKeyword: null,
+        seriesId: null,
+        status: 0,
       },
       // 表单参数
       form: {},
@@ -514,6 +547,9 @@ export default {
         cateId: [
           { required: true, message: "产品类别不能为空", trigger: "blur" },
         ],
+        seriesId: [
+          { required: true, message: "产品系列不能为空", trigger: "blur" },
+        ],
         storeInfo: [
           { required: true, message: "商品介绍不能为空", trigger: "blur" },
         ],
@@ -524,6 +560,15 @@ export default {
       },
     };
   },
+  watch: {
+    "form.cateId": function (newVal, oldVal) {
+      if (newVal && newVal !== oldVal) {
+        getSeries(this.form.cateId).then((res) => {
+          this.seriesList = res.data;
+        });
+      }
+    },
+  },
   created() {
     this.getList();
     this.getDicts("sys_products_show").then((response) => {
@@ -531,33 +576,15 @@ export default {
     });
   },
   methods: {
-    imgClick(link) {
-      this.srcList.length = 0;
-      this.srcList.push(link);
+    formatImg(str) {
+      return str.split(",")[0];
     },
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.showOptions, row.isPostage);
-    },
-    handleRemove(file, fileList) {
-      this.form.image = [];
-      this.imgFile = [];
-      console.log(file, fileList);
-    },
-    handleSuccess(file) {
-      console.log(file);
-      this.form.image = file.url;
-    },
-    handlePreview(file) {
-      console.log(file);
-    },
-    handleExceed(files, fileList) {
-      this.$message.warning(
-        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件`
-      );
+    changeCateId() {
+      this.form.seriesId = null;
     },
 
-    beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
+    statusFormat(row, column) {
+      return this.selectDictLabel(this.showOptions, row.isPostage);
     },
 
     /** 查询商品列表 */
@@ -590,12 +617,11 @@ export default {
     },
     // 表单重置
     reset() {
-      this.imgFile = [];
       this.form = {
         id: null,
         merId: null,
-        image: null,
-        sliderImage: null,
+        image: [],
+        sliderImage: [],
         storeName: null,
         storeInfo: null,
         price: null,
@@ -625,7 +651,7 @@ export default {
         browse: null,
         codePath: null,
         soureLink: null,
-        hotImage: null,
+        hotImage: [],
         productUrl: null,
         specification: null,
         recommond: null,
@@ -636,6 +662,7 @@ export default {
         productTitle: null,
         productRepresent: null,
         productKeyword: null,
+        seriesId: null,
       };
       this.resetForm("form");
     },
@@ -661,24 +688,18 @@ export default {
       this.reset();
       this.open = true;
       this.title = "添加商品";
+      this.seriesList = [];
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      let cateNameList = "";
       this.reset();
-      getCategoryList().then((res) => {
-        cateNameList = res.data.categoryList;
-      });
       const id = row.id || this.ids;
       getProduct(id).then((response) => {
+        response.data.image = response.data.image.split(",");
+        response.data.sliderImage = [response.data.sliderImage];
+        response.data.hotImage = [response.data.hotImage];
         this.form = response.data;
-        for (let num of cateNameList) {
-          if (num.id == response.data.cateId) {
-            this.form.cateId = num.cate_name;
-            break;
-          }
-        }
-        this.imgFile.push({ url: response.data.image, name: "Image" });
+        // this.imgFile.push({ url: response.data.image, name: "Image" });
         this.open = true;
         this.title = "修改商品";
       });
@@ -688,6 +709,9 @@ export default {
       this.$refs["form"].validate((valid) => {
         let that = this;
         if (valid) {
+          this.form.image = this.form.image.join(",");
+          this.form.sliderImage = this.form.sliderImage.join(",");
+          this.form.hotImage = this.form.hotImage.join(",");
           if (this.form.id != null) {
             let cateNameList = "";
             getCategoryList().then((res) => {
@@ -751,5 +775,15 @@ export default {
 <style>
 .el-upload-list--picture .el-upload-list__item {
   transition: all 0s;
+}
+.hide .el-upload--picture-card {
+  display: none;
+}
+.el-upload-list__item {
+  transition: none !important;
+}
+.el-upload-list__item-thumbnail {
+  /* 图片在方框内显示长边 */
+  object-fit: scale-down !important;
 }
 </style>

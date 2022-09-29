@@ -5,7 +5,7 @@
       ref="queryForm"
       :inline="true"
       v-show="showSearch"
-      label-width="158px"
+      label-width="128px"
     >
       <el-form-item label="帖子编号" prop="id">
         <el-input
@@ -16,10 +16,10 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="2热门3精华4普通" prop="communityType">
+      <el-form-item label="帖子类型" prop="communityType">
         <el-select
           v-model="queryParams.communityType"
-          placeholder="请选择2热门3精华4普通"
+          placeholder="请选择帖子类型"
           clearable
           size="small"
         >
@@ -266,7 +266,7 @@
       <el-table-column label="帖子编号" align="center" prop="id" />
       <el-table-column label="用户id" align="center" prop="userId" />
       <el-table-column
-        label="2热门3精华4普通"
+        label="帖子类型"
         align="center"
         sortable
         prop="communityType"
@@ -402,10 +402,10 @@
         <!-- <el-form-item label="用户id" prop="userId">
           <el-input v-model="form.userId" placeholder="请输入用户id" />
         </el-form-item> -->
-        <el-form-item label="2热门3精华4普通" prop="communityType">
+        <el-form-item label="帖子类型" prop="communityType">
           <el-select
             v-model="form.communityType"
-            placeholder="请选择2热门3精华4普通"
+            placeholder="请选择帖子类型"
           >
             <el-option
               v-for="dict in postSortOptions"

@@ -19,7 +19,7 @@
       <el-form-item label="类型" prop="type">
         <el-select
           v-model="queryParams.type"
-          placeholder="请选择类型，0普通1推荐2热门"
+          placeholder="请选择类型"
           clearable
           size="small"
         >
@@ -116,7 +116,7 @@
         prop="content"
       /> -->
       <el-table-column
-        label="类型，1推荐2热门"
+        label="活动类型"
         align="center"
         :formatter="activityStatus"
         prop="type"
@@ -166,7 +166,7 @@
         <el-form-item label="活动类型" prop="type">
           <el-select
             v-model="form.type"
-            placeholder="请选择类型，0普通1推荐2热门"
+            placeholder="请选择类型"
           >
             <el-option
               v-for="dict in activityOptions"

@@ -1,5 +1,13 @@
 import request from '@/utils/request'
 
+// 查询系列
+export function getSeries(id) {
+  return request({
+    url: '/system/category/getSeries/'+id,
+    method: 'get',
+  })
+}
+
 // 查询商品列表
 export function listProduct(query) {
   return request({
