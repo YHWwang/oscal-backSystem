@@ -146,7 +146,7 @@ export default {
     /** 查询角色列表 */
     getList() {
       this.loading = true;
-      listTdk().then((response) => {
+      listTdk(this.queryParams).then((response) => {
         this.tdkList = response.rows;
         this.total = response.total;
         this.loading = false;

@@ -192,7 +192,7 @@
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item label="活动内容">
+        <el-form-item label="活动内容" prop="content">
           <editor
             v-model="form.content"
             :uploadUrl="imgUrl"
@@ -265,7 +265,20 @@ export default {
       // 表单参数
       form: {},
       // 表单校验
-      rules: {},
+      rules: {
+         title: [
+          { required: true, message: "标题不能为空", trigger: "blur" }
+        ],
+         coverPic: [
+          { required: true, message: "封面图不能为空", trigger: "blur" }
+        ],
+         content: [
+          { required: true, message: "活动内容不能为空", trigger: "blur" }
+        ],
+         type: [
+          { required: true, message: "类型不能为空", trigger: "blur" }
+        ],
+      },
       activityOptions: "",
     };
   },

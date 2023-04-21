@@ -486,10 +486,10 @@
             @change="selectCategoryId"
           ></el-cascader>
         </el-form-item>
-        <el-form-item label="是否首页推荐" prop="isHomeIndex">
+        <el-form-item label="首页推荐位置" prop="isHomeIndex">
           <el-select
             v-model="form.isHomeIndex"
-            placeholder="是否首页推荐0不推荐1推荐"
+            placeholder="首页推荐位置"
             size="small"
           >
             <el-option

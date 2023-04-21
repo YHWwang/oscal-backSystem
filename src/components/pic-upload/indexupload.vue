@@ -119,13 +119,15 @@ export default {
     beforeAvatarUpload(file) {
       //图片格式
       const isJPG =
+       file.type === "image/webp" ||
+        file.type === "image/gif" ||
         file.type === "image/jpg" ||
         file.type === "image/png" ||
         file.type === "image/jpeg";
       //图片大小
       const isLt2M = file.size / 1024 / 1024 < 2;
       if (!isJPG) {
-        this.$message.error("上传图片只能为jpg、jpeg、png格式");
+        this.$message.error("上传图片只能为jpg、jpeg、png、webp、gif格式");
       }
       if (!isLt2M) {
         this.$message.error("上传图片大小不能超过2MB");

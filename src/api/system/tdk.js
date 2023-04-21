@@ -1,10 +1,11 @@
 import request from '@/utils/request'
 
 // 查询TDK列表
-export function listTdk() {
+export function listTdk(query) {
   return request({
     url: '/system/tdk/list',
     method: 'get',
+    params: query
   })
 }
 // 修改TDK列表

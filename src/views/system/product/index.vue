@@ -16,18 +16,19 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-
-      <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="dateRange"
-          size="small"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
+      <el-form-item label="产品类别" prop="cateId">
+        <el-select
+          v-model="queryParams.cateId"
+          clearable
+          placeholder="请选择产品类别"
+        >
+          <el-option
+            v-for="dict in cateNameList"
+            :key="dict.id"
+            :label="dict.cate_name"
+            :value="dict.id"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="官网上架状态" prop="isPostage">
         <el-select
@@ -146,17 +147,12 @@
         prop="storeInfo"
         show-overflow-tooltip
       />
-
-      <el-table-column
-        label="创建时间"
+       <el-table-column
+        label="排序"
         align="center"
-        prop="addTime"
+        prop="sort"
         show-overflow-tooltip
-      >
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.addTime, "{y}-{m}-{d}") }}</span>
-        </template>
-      </el-table-column>
+      />
       <el-table-column
         label="官网上架状态"
         sortable
@@ -219,7 +215,7 @@
         <el-form-item label="pc产品封面图" prop="hotImage">
           <picUpload v-model="form.hotImage" :num="1"></picUpload>
           <p>
-            C系列首第一张：590*660，其它590*320；S系列386*560；Pad系列590*660
+            C系列首第一张：590*660，其它590*320；S系列386*560；Pad系列590*660,储能系列590*660
           </p>
         </el-form-item>
         <el-form-item label="app产品封面图" prop="sliderImage">
@@ -345,6 +341,7 @@
         <el-form-item label="产品描述" prop="description">
           <el-input
             type="textarea"
+            :rows='10'
             v-model="form.description"
             placeholder="请输入产品描述"
           />
@@ -357,7 +354,7 @@
           />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
-          <el-input type="text" v-model="form.sort" placeholder="请输入排序" />
+          <el-input type="number" v-model="form.sort" placeholder="请输入排序" />
         </el-form-item>
         <el-form-item label="seo-title" prop="seoTitle">
           <el-input v-model="form.seoTitle" placeholder="" />
