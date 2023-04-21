@@ -18,6 +18,8 @@ selenium-debug.log
 *.njsproj
 *.sln
 *.local
+*.development
+*.production
 
 package-lock.json
 yarn.lock
