@@ -174,12 +174,6 @@ export default {
          middleImg : [
           { required: true, message: "封面图片不能为空", trigger: "blur" }
         ],
-        middleTitle  : [
-          { required: true, message: "标题不能为空", trigger: "blur" }
-        ],
-        middleSpecification  : [
-          { required: true, message: "规格不能为空", trigger: "blur" }
-        ],
       }
     };
   },
