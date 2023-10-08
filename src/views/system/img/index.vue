@@ -163,7 +163,7 @@ export default {
         pageSize: 10,
         middleImg: null,
         middleTitle: null,
-        middleSpecification: null,
+        middleSpecification: '',
         middleCre: null,
         middleUp: null
       },
@@ -223,7 +223,7 @@ export default {
         id: null,
         middleImg: null,
         middleTitle: null,
-        middleSpecification: null,
+        middleSpecification: '',
         middleCre: null,
         middleUp: null
       };
