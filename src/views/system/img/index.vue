@@ -62,7 +62,12 @@
       </el-table-column>
       <el-table-column label="中部标题" align="center" prop="middleTitle" />
       <el-table-column label="中部规格" align="center" prop="middleSpecification" show-overflow-tooltip/>
-      <el-table-column label="创建时间" align="center" prop="middleCre" />
+      <el-table-column label="排序" align="center" prop="sortNum" />
+      <el-table-column label="状态" align="center" prop="status" >
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.status ? 'info':'success'">{{scope.row.status ? '隐藏':'显示'}}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="修改时间" align="center" prop="middleUp" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -96,28 +101,26 @@
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="中部封面图片" prop="middleImg">
-          <el-upload
-            class="upload-demo"
-            :action="imgUrl"
-            :on-success="handleSuccess"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            :before-remove="beforeRemove"
-            multiple
-            list-type="picture"
-            :limit="1"
-            :file-list="imgFile"
-            :on-exceed="handleExceed"
-          >
-            <el-button size="small" type="primary">点击上传</el-button>
-          </el-upload>
-          <!-- <el-input v-model="form.middleImg" placeholder="请输入中部封面图片" /> -->
+          <MaterialList
+            v-model="form.middleImg"
+            type="image"
+            :num="1"
+          />
         </el-form-item>
         <el-form-item label="中部标题" prop="middleTitle">
           <el-input v-model="form.middleTitle" placeholder="请输入中部标题" />
         </el-form-item>
         <el-form-item label="中部规格" prop="middleSpecification">
           <el-input type="textarea" v-model="form.middleSpecification" placeholder="请输入中部规格" />
+        </el-form-item>
+        <el-form-item label="排序" prop="sortNum">
+          <el-input type="number" v-model="form.sortNum" placeholder="排序" />
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="form.status">
+            <el-radio :label="0">显示</el-radio>
+            <el-radio :label="1">隐藏</el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -131,8 +134,11 @@
 <script>
 import { listImg, getImg, delImg, addImg, updateImg, exportImg } from "@/api/system/img";
 import {  formatString} from "@/api/system/public";
+import MaterialList from "@/components/material";
+import { deepClone } from "@/utils/index";
 export default {
   name: "Img",
+  components: { MaterialList },
   data() {
     return {
        imgFile: [],
@@ -181,27 +187,6 @@ export default {
     this.getList();
   },
   methods: {
-      handleRemove(file, fileList) {
-      this.form.middleImg = [];
-      this.imgFile = [];
-      console.log(file, fileList);
-    },
-    handleSuccess(file) {
-      console.log(file);
-      this.form.middleImg = file.url;
-    },
-    handlePreview(file) {
-      console.log(file);
-    },
-    handleExceed(files, fileList) {
-      this.$message.warning(
-        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件`
-      );
-    },
-
-    beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
-    },
     /** 查询底部轮播图列表 */
     getList() {
       this.loading = true;
@@ -221,11 +206,13 @@ export default {
         this.imgFile = []
       this.form = {
         id: null,
-        middleImg: null,
+        middleImg: [],
         middleTitle: null,
         middleSpecification: '',
         middleCre: null,
-        middleUp: null
+        middleUp: null,
+        status:0,
+        sortNum:null
       };
       this.resetForm("form");
     },
@@ -257,11 +244,8 @@ export default {
       this.reset();
       const id = row.id || this.ids
       getImg(id).then(response => {
+        response.data.middleImg = response.data.middleImg.split(",");
         this.form = response.data;
-          this.imgFile.push(
-          {'url':response.data.middleImg,
-          'name':'Image'}
-          ) 
         this.open = true;
         this.title = "修改底部轮播图";
       });
@@ -270,15 +254,17 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          this.form.middleSpecification = formatString(this.form.middleSpecification)
-          if (this.form.id != null) {
-            updateImg(this.form).then(response => {
+          let formData = deepClone(this.form)
+          formData.middleImg = formData.middleImg.join(",");
+          formData.middleSpecification = formatString(formData.middleSpecification)
+          if (formData.id != null) {
+            updateImg(formData).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addImg(this.form).then(response => {
+            addImg(formData).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();

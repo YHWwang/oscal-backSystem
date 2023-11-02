@@ -19,6 +19,7 @@
       <el-form-item label="产品类别" prop="cateId">
         <el-select
           v-model="queryParams.cateId"
+          @change="changeQueryCateId"
           clearable
           placeholder="请选择产品类别"
         >
@@ -27,6 +28,20 @@
             :key="dict.id"
             :label="dict.cate_name"
             :value="dict.id"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="系列" prop="seriesId">
+        <el-select
+          v-model="queryParams.seriesId"
+          clearable
+          placeholder="请选择产品系列"
+        >
+          <el-option
+            v-for="res in seriesList"
+            :key="res.id"
+            :label="res.name"
+            :value="res.id"
           />
         </el-select>
       </el-form-item>
@@ -121,15 +136,11 @@
       <el-table-column label="商品id" align="center" prop="id" />
       <el-table-column label="商品图片" align="center">
         <template slot-scope="scope">
-          <a
-            :href="formatImg(scope.row.image)"
-            style="color: #42b983"
-            target="_blank"
-            ><img
-              :src="formatImg(scope.row.image)"
-              alt="点击打开"
-              class="el-avatar"
-          /></a>
+          <el-image 
+            style="width: 100px; height: 100px"
+            :src="formatImg(scope.row.image)" 
+            :preview-src-list="[formatImg(scope.row.image)]">
+          </el-image>
         </template>
       </el-table-column>
       <el-table-column label="商品名称" align="center" prop="storeName" />
@@ -147,19 +158,26 @@
         prop="storeInfo"
         show-overflow-tooltip
       />
-       <el-table-column
+      <el-table-column
         label="排序"
         align="center"
         prop="sort"
+        sortable
         show-overflow-tooltip
       />
+      <el-table-column label="创建时间" align="center" prop="addTime" />
       <el-table-column
-        label="官网上架状态"
+        label="官网状态"
         sortable
         align="center"
         prop="isPostage"
-        :formatter="statusFormat"
-      />
+      >
+      <template slot-scope="scope">
+        <el-tag
+          :type="scope.row.isPostage == 0 ? 'info' : 'success'"
+          disable-transitions>{{scope.row.isPostage == 0 ? '下架' : '上架'}}</el-tag>
+      </template>
+    </el-table-column>
 
       <el-table-column
         label="操作"
@@ -198,34 +216,6 @@
     <!-- 添加或修改商品对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
-        <!-- <el-form-item label="商户Id" prop="merId">
-          <el-input
-            v-model="form.merId"
-            placeholder="请输入商户Id(0为总后台管理员创建,不为0的时候是商户后台创建)"
-          />
-        </el-form-item> -->
-        <el-form-item label="商品图片" prop="image">
-          <picUpload
-            v-model="form.image"
-            :num="4"
-            :pw="1200"
-            :ph="1200"
-          ></picUpload>
-        </el-form-item>
-        <el-form-item label="pc产品封面图" prop="hotImage">
-          <picUpload v-model="form.hotImage" :num="1"></picUpload>
-          <p>
-            C系列首第一张：590*660，其它590*320；S系列386*560；Pad系列590*660,储能系列590*660
-          </p>
-        </el-form-item>
-        <el-form-item label="app产品封面图" prop="sliderImage">
-          <picUpload
-            v-model="form.sliderImage"
-            :num="1"
-            :pw="750"
-            :ph="750"
-          ></picUpload>
-        </el-form-item>
         <el-form-item label="商品名称" prop="storeName">
           <el-input v-model="form.storeName" placeholder="请输入商品名称" />
         </el-form-item>
@@ -262,6 +252,18 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-form-item label="商品图片" prop="image">
+          <MaterialList v-model="form.image" type="image" :num="4" />
+        </el-form-item>
+        <el-form-item label="pc产品封面图" prop="hotImage">
+          <MaterialList v-model="form.hotImage" type="image" :num="1" />
+          <p>
+            TIGER系列590*320(备注：首张590*660)；S系列386*560；Pad系列590*660,储能系列590*660
+          </p>
+        </el-form-item>
+        <el-form-item label="app产品封面图" prop="sliderImage">
+          <MaterialList v-model="form.sliderImage" type="image" :num="1" />
+        </el-form-item>
         <el-form-item label="产品标签" prop="status">
           <el-select v-model="form.status" placeholder="请选择产品标签">
             <el-option :key="0" label="普通" :value="0" />
@@ -272,56 +274,6 @@
         <el-form-item label="文件名" prop="fileIndex">
           <el-input v-model="form.fileIndex" placeholder="请输入文件名" />
         </el-form-item>
-        <!-- <el-form-item label="关键字" prop="keyword">
-          <el-input v-model="form.keyword" placeholder="请输入关键字" />
-        </el-form-item>
-        <el-form-item label="产品条码" prop="barCode">
-          <el-input v-model="form.barCode" placeholder="请输入产品条码" />
-        </el-form-item>
-        <el-form-item label="分类id" prop="cateId">
-          <el-input v-model="form.cateId" placeholder="请输入分类id" />
-        </el-form-item>
-        <el-form-item label="商品价格" prop="price">
-          <el-input v-model="form.price" placeholder="请输入商品价格" />
-        </el-form-item>
-        <el-form-item label="会员价格" prop="vipPrice">
-          <el-input v-model="form.vipPrice" placeholder="请输入会员价格" />
-        </el-form-item>
-        <el-form-item label="市场价" prop="otPrice">
-          <el-input v-model="form.otPrice" placeholder="请输入市场价" />
-        </el-form-item>
-        <el-form-item label="邮费" prop="postage">
-          <el-input v-model="form.postage" placeholder="请输入邮费" />
-        </el-form-item>
-      
-        <el-form-item label="排序" prop="sort">
-          <el-input v-model="form.sort" placeholder="请输入排序" />
-        </el-form-item>
-        <el-form-item label="销量" prop="sales">
-          <el-input v-model="form.sales" placeholder="请输入销量" />
-        </el-form-item>
-        <el-form-item label="库存" prop="stock">
-          <el-input v-model="form.stock" placeholder="请输入库存" />
-        </el-form-item>
-        <el-form-item label="商城上架状态" prop="isShow">
-          <el-input v-model="form.isShow" placeholder="请输入商城上架状态" />
-        </el-form-item>
-        <el-form-item label="是否热卖单品" prop="isHot">
-          <el-input v-model="form.isHot" placeholder="请输入是否热卖单品" />
-        </el-form-item>
-        <el-form-item label="是否促销单品" prop="isBenefit">
-          <el-input v-model="form.isBenefit" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-        <el-form-item label="是否首页hot" prop="isBest">
-          <el-input v-model="form.isBest" placeholder="请输入是否首页hot" />
-        </el-form-item>
-        <el-form-item label="是否首发新品" prop="isNew">
-          <el-input v-model="form.isNew" placeholder="请输入是否首发新品" />
-        </el-form-item>
-      -->
-        <!-- <el-form-item label="添加时间" prop="addTime">
-          <el-input v-model="form.addTime" placeholder="请输入添加时间" />
-        </el-form-item> -->
         <el-form-item label="官网上架状态" prop="isPostage">
           <el-radio-group v-model="form.isPostage">
             <el-radio
@@ -341,7 +293,7 @@
         <el-form-item label="产品描述" prop="description">
           <el-input
             type="textarea"
-            :rows='10'
+            :rows="10"
             v-model="form.description"
             placeholder="请输入产品描述"
           />
@@ -349,12 +301,17 @@
         <el-form-item label="规格书" prop="specification">
           <el-input
             type="textarea"
+            :rows="10"
             v-model="form.specification"
             placeholder="请输入规格书"
           />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
-          <el-input type="number" v-model="form.sort" placeholder="请输入排序" />
+          <el-input
+            type="number"
+            v-model="form.sort"
+            placeholder="请输入排序"
+          />
         </el-form-item>
         <el-form-item label="seo-title" prop="seoTitle">
           <el-input v-model="form.seoTitle" placeholder="" />
@@ -365,65 +322,6 @@
         <el-form-item label="seo-keywords" prop="productRepresent">
           <el-input v-model="form.productRepresent" placeholder="" />
         </el-form-item>
-        <!-- <el-form-item label="是否删除(0：未删除，1：删除)" prop="isDel">
-          <el-input v-model="form.isDel" placeholder="请输入是否删除(0：未删除，1：删除)" />
-        </el-form-item>
-        <el-form-item label="商户是否代理 0不可代理1可代理" prop="merUse">
-          <el-input v-model="form.merUse" placeholder="请输入商户是否代理 0不可代理1可代理" />
-        </el-form-item>
-        <el-form-item label="获得积分" prop="giveIntegral">
-          <el-input v-model="form.giveIntegral" placeholder="请输入获得积分" />
-        </el-form-item>
-        <el-form-item label="成本价" prop="cost">
-          <el-input v-model="form.cost" placeholder="请输入成本价" />
-        </el-form-item>
-        <el-form-item label="秒杀状态 0 未开启 1已开启" prop="isSeckill">
-          <el-input v-model="form.isSeckill" placeholder="请输入秒杀状态 0 未开启 1已开启" />
-        </el-form-item>
-        <el-form-item label="砍价状态 0未开启 1开启" prop="isBargain">
-          <el-input v-model="form.isBargain" placeholder="请输入砍价状态 0未开启 1开启" />
-        </el-form-item>
-        <el-form-item label="是否底部推荐" prop="isGood">
-          <el-input v-model="form.isGood" placeholder="请输入是否底部推荐" />
-        </el-form-item>
-        <el-form-item label="虚拟销量" prop="ficti">
-          <el-input v-model="form.ficti" placeholder="请输入虚拟销量" />
-        </el-form-item>
-        <el-form-item label="浏览量" prop="browse">
-          <el-input v-model="form.browse" placeholder="请输入浏览量" />
-        </el-form-item>
-        <el-form-item label="产品二维码地址(用户小程序海报)" prop="codePath">
-          <el-input v-model="form.codePath" placeholder="请输入产品二维码地址(用户小程序海报)" />
-        </el-form-item>
-      
-      
-       
-      
-        <el-form-item label="关联的商品id集合" prop="recommond">
-          <el-input v-model="form.recommond" placeholder="请输入关联的商品id集合" />
-        </el-form-item>
-        <el-form-item label="关联的商品id集合" prop="cateShopId">
-          <el-input v-model="form.cateShopId" placeholder="请输入关联的商品id集合" />
-        </el-form-item>
-        <el-form-item label="新增产品描述用于区分产品描述" prop="productDescription">
-          <el-input v-model="form.productDescription" placeholder="请输入新增产品描述用于区分产品描述" />
-        </el-form-item>
-        <el-form-item label="seo标题" prop="seoTitle">
-          <el-input v-model="form.seoTitle" placeholder="请输入seo标题" />
-        </el-form-item>
-        <el-form-item label="seo关键字" prop="seoKeywords">
-          <el-input v-model="form.seoKeywords" placeholder="请输入seo关键字" />
-        </el-form-item>
-        <el-form-item label="标题" prop="productTitle">
-          <el-input v-model="form.productTitle" placeholder="请输入标题" />
-        </el-form-item>
-        <el-form-item label="描述" prop="productRepresent">
-          <el-input v-model="form.productRepresent" placeholder="请输入描述" />
-        </el-form-item> 
-        <el-form-item label="关键字" prop="productKeyword">
-          <el-input v-model="form.productKeyword" placeholder="请输入关键字" />
-        </el-form-item>
-        -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -444,10 +342,11 @@ import {
   exportProduct,
   getSeries,
 } from "@/api/system/product";
-import picUpload from "@/components/pic-upload/indexupload";
+import MaterialList from "@/components/material";
+import { deepClone } from "@/utils/index";
 export default {
   name: "Product",
-  components: { picUpload },
+  components: { MaterialList },
   data() {
     return {
       seriesList: [],
@@ -565,6 +464,13 @@ export default {
         });
       }
     },
+    "queryParams.cateId": function (newVal, oldVal) {
+      if (newVal && newVal !== oldVal) {
+        getSeries(this.queryParams.cateId).then((res) => {
+          this.seriesList = res.data;
+        });
+      }
+    },
   },
   created() {
     this.getList();
@@ -579,22 +485,19 @@ export default {
     changeCateId() {
       this.form.seriesId = null;
     },
-
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.showOptions, row.isPostage);
+    changeQueryCateId() {
+      this.queryParams.seriesId = null;
     },
 
     /** 查询商品列表 */
     getList() {
-      let cateNameList = "";
       this.loading = true;
       listProduct(this.addDateRange(this.queryParams, this.dateRange)).then(
         (response) => {
           this.productList = response.rows;
           getCategoryList().then((res) => {
             this.cateNameList = res.data.categoryList;
-            cateNameList = res.data.categoryList;
-            for (let data of cateNameList) {
+            for (let data of this.cateNameList) {
               for (let j in this.productList) {
                 if (data.id == this.productList[j].cateId) {
                   this.productList[j].cateId = data.cate_name;
@@ -634,7 +537,17 @@ export default {
         isBenefit: null,
         isBest: null,
         isNew: null,
-        description: null,
+        description: `
+        <div class="main" id="">
+            <p style="text-align: center;width: 100%;font-size: 54px;padding: 10vw 0;">
+                Coming Soon
+            </p>
+        </div>
+        <script
+            src=" https://d2kbvjszk9d5ln.cloudfront.net/yshop/upload/other/jquery-3.3.1.min-20201130021002922.js"><\/script>
+        <script
+            src="https://d2kbvjszk9d5ln.cloudfront.net/yshop/upload/other/lazysizes.min-20201204070627489.js"><\/script>
+        `,
         addTime: null,
         isPostage: null,
         isDel: null,
@@ -650,7 +563,58 @@ export default {
         soureLink: null,
         hotImage: [],
         productUrl: null,
-        specification: null,
+        specification: `
+        <div class="products_spesc">
+            <div class="spesc-img-left">
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <img class="image-active on"
+                                src="图片1"
+                                alt="">
+                        </div>
+                        <div class="swiper-slide">
+                            <img class="image-active"
+                                src="图片2"
+                                alt="">
+                        </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+            <div class="spesc-img-right">
+                <ul class="spesc-img-right-ul">
+                    <li class="spesc-img-right-ul-li spesc-active" num='0'>
+                        <div class="spescColor"
+                            style="background: linear-gradient(90deg, #颜色值1 10%, #颜色值1 27%, #颜色值1 46%, #颜色值1 73%, #颜色值1 99%);">
+                        </div>
+                        <p class="spescColorName">颜色1</p>
+                    </li>
+                    <li class="spesc-img-right-ul-li" num='1'>
+                        <div class="spescColor"
+                            style="background: linear-gradient(90deg, #颜色值2 10%, #颜色值2 27%, #颜色值2 46%, #颜色值2 73%, #颜色值2 99%);">
+                        </div>
+                        <p class="spescColorName">颜色2</p>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+        <div class="oscal-spescBoxBg">
+            <div class="oscal-specification-table">
+              <table>
+                    <tr>
+                        <td class="oscal-specification-table-tit">
+                            <p>Model</p>
+                        </td>
+                        <td>
+                            <p>xxx</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        `,
         recommond: null,
         cateShopId: null,
         productDescription: null,
@@ -693,8 +657,12 @@ export default {
       const id = row.id || this.ids;
       getProduct(id).then((response) => {
         response.data.image = response.data.image.split(",");
-        response.data.sliderImage = [response.data.sliderImage];
-        response.data.hotImage = [response.data.hotImage];
+        response.data.sliderImage =
+          response.data.sliderImage.length > 0
+            ? [response.data.sliderImage]
+            : [];
+        response.data.hotImage =
+          response.data.hotImage.length > 0 ? [response.data.hotImage] : [];
         this.form = response.data;
         // this.imgFile.push({ url: response.data.image, name: "Image" });
         this.open = true;
@@ -704,29 +672,29 @@ export default {
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate((valid) => {
-        let that = this;
         if (valid) {
-          this.form.image = this.form.image.join(",");
-          this.form.sliderImage = this.form.sliderImage.join(",");
-          this.form.hotImage = this.form.hotImage.join(",");
-          if (this.form.id != null) {
+          let data = deepClone(this.form);
+          data.image = data.image.join(",");
+          data.sliderImage = data.sliderImage.join(",");
+          data.hotImage = data.hotImage.join(",");
+          if (data.id != null) {
             let cateNameList = "";
             getCategoryList().then((res) => {
               cateNameList = res.data.categoryList;
               for (let num of cateNameList) {
-                if (num.cate_name == that.form.cateId) {
-                  that.form.cateId = num.id;
+                if (num.cate_name == data.cateId) {
+                  data.cateId = num.id;
                   break;
                 }
               }
-              updateProduct(that.form).then((response) => {
+              updateProduct(data).then((response) => {
                 this.msgSuccess("修改成功");
                 this.open = false;
                 this.getList();
               });
             });
           } else {
-            addProduct(this.form).then((response) => {
+            addProduct(data).then((response) => {
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();

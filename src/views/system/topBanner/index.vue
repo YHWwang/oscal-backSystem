@@ -1,10 +1,45 @@
 <template>
   <div class="app-container">
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+          >新增</el-button
+        >
+      </el-col>
+      <right-toolbar
+        :showSearch.sync="showSearch"
+        @queryTable="getList"
+      ></right-toolbar>
+    </el-row>
     <el-table v-loading="loading" :data="topBannerList">
       <el-table-column label="ID" align="center" width="55" prop="id" />
-      <el-table-column label="顶部图片pc" align="center" prop="pcImgUrl" />
-      <el-table-column label="顶部图片app" align="center" prop="appImgUrl" />
+      <el-table-column label="顶部图片pc" align="center" prop="pcImgUrl" >
+        <template slot-scope="scope">
+          <el-image 
+            :src="scope.row.pcImgUrl" 
+            :preview-src-list="[scope.row.pcImgUrl]">
+          </el-image>
+        </template>
+      </el-table-column>
+      <el-table-column label="顶部图片app" align="center" prop="appImgUrl" >
+        <template slot-scope="scope">
+          <el-image 
+            :src="scope.row.appImgUrl" 
+            :preview-src-list="[scope.row.appImgUrl]">
+          </el-image>
+        </template>
+      </el-table-column>
       <el-table-column label="跳转链接" align="center" prop="jumpUrl" />
+      <el-table-column label="创建时间" align="center" prop="createTime" />
+      <el-table-column label="状态" align="center" prop="status" >
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.status ? 'info':'success'">{{scope.row.status ? '隐藏':'显示'}}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column
         label="操作"
         align="center"
@@ -19,6 +54,14 @@
             v-hasPermi="['system:topBanner:edit']"
             >修改</el-button
           >
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="handleDelete(scope.row)"
+            v-hasPermi="['system:topBanner:remove']"
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -28,24 +71,28 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="顶部图片pc" prop="pcImgUrl">
           <!-- <el-input v-model="form.pcImgUrl" placeholder="请输入顶部图片pc" /> -->
-          <picUpload
+          <MaterialList
             v-model="form.pcImgUrl"
-            :pw="1920"
-            :ph="100"
+            type="image"
             :num="1"
-          ></picUpload>
+          />
         </el-form-item>
         <el-form-item label="顶部图片app" prop="appImgUrl">
           <!-- <el-input v-model="form.appImgUrl" placeholder="请输入顶部图片app" /> -->
-          <picUpload
+          <MaterialList
             v-model="form.appImgUrl"
-            :pw="750"
-            :ph="100"
+            type="image"
             :num="1"
-          ></picUpload>
+          />
         </el-form-item>
         <el-form-item label="跳转链接" prop="jumpUrl">
           <el-input v-model="form.jumpUrl" placeholder="请输入跳转链接" />
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="form.status">
+            <el-radio :label="0">显示</el-radio>
+            <el-radio :label="1">隐藏</el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -61,14 +108,15 @@ import {
   listTopBanner,
   getTopBanner,
   updateTopBanner,
+  delTopBanner,
 } from "@/api/system/topBanner";
 import { deepClone } from "@/utils/index";
-import picUpload from "@/components/pic-upload/indexupload";
+import MaterialList from "@/components/material";
 
 export default {
   name: "TopBanner",
 
-  components: { picUpload },
+  components: { MaterialList },
   data() {
     return {
       // 遮罩层
@@ -117,6 +165,12 @@ export default {
     this.getList();
   },
   methods: {
+    /** 新增按钮操作 */
+    handleAdd() {
+      this.reset();
+      this.open = true;
+      this.title = "添加广告";
+    },
     /** 查询topBanner列表 */
     getList() {
       this.loading = true;
@@ -139,6 +193,8 @@ export default {
         appImgUrl: [],
         jumpUrl: null,
         createTime: null,
+        status: 0,
+        sortNum: null,
       };
       this.resetForm("form");
     },
@@ -153,6 +209,22 @@ export default {
         this.open = true;
         this.title = "修改topBanner";
       });
+    },
+    /** 删除按钮操作 */
+    handleDelete(row) {
+      const ids = row.id || this.ids;
+      this.$confirm('是否确认删除广告编号为"' + ids + '"的数据项?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(function () {
+          return delTopBanner(ids);
+        })
+        .then(() => {
+          this.getList();
+          this.msgSuccess("删除成功");
+        });
     },
     /** 提交按钮 */
     submitForm() {

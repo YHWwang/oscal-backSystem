@@ -84,13 +84,24 @@
           ></el-image>
         </template>
       </el-table-column>
-      <el-table-column label="分类名称" align="center" prop="cateName" />
-      <el-table-column
-        label="展示状态"
-        align="center"
-        prop="isShow"
-        :formatter="statusFormat"
-      />
+      <el-table-column label="分类名称" align="center" prop="cateName">
+        <template slot-scope="scope">
+          <router-link
+            style="color: #409eff"
+            :to="'/category/series?categoryId=' + scope.row.id"
+            >{{ scope.row.cateName }}</router-link
+          >
+        </template>
+      </el-table-column>
+      <el-table-column label="展示状态" align="center" prop="isShow">
+        <template slot-scope="scope">
+          <el-tag
+            :type="scope.row.isShow == 0 ? 'info' : 'success'"
+            disable-transitions
+            >{{ scope.row.isShow == 0 ? "隐藏" : "显示" }}</el-tag
+          >
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="addTime">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.addTime, "{y}-{m}-{d}") }}</span>
@@ -167,32 +178,13 @@
         <el-form-item label="排序" prop="sort">
           <el-input v-model="form.sort" placeholder="请输入排序" />
         </el-form-item>
-        <el-form-item label="请上传图标">
-          <el-upload
-            class="upload-demo"
-            :action="imgUrl"
-            :on-success="handleSuccess"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            :before-remove="beforeRemove"
-            multiple
-            list-type="picture"
-            :limit="1"
-            :file-list="imgFile"
-            :on-exceed="handleExceed"
-          >
-            <el-button size="small" type="primary">点击上传</el-button>
-          </el-upload>
-          <!-- <el-input
-            v-model="form.pic"
-            type="textarea"
-            placeholder="请输入图标地址"
-          /> -->
+        <el-form-item label="请上传图标" prop="pic">
+          <MaterialList v-model="form.pic" type="image" :num="1" />
         </el-form-item>
-         <el-form-item label="封面跳转地址" prop="toUrl">
+        <el-form-item label="封面跳转地址" prop="toUrl">
           <el-input v-model="form.toUrl" />
         </el-form-item>
-         <el-form-item label="seo-title" prop="categoryTitle">
+        <el-form-item label="seo-title" prop="categoryTitle">
           <el-input v-model="form.categoryTitle" />
         </el-form-item>
         <el-form-item label="seo-describe" prop="categoryDes">
@@ -220,9 +212,11 @@ import {
   updateCategory,
   exportCategory,
 } from "@/api/system/category";
-
+import { deepClone } from "@/utils/index";
+import MaterialList from "@/components/material";
 export default {
   name: "Category",
+  components: { MaterialList },
   data() {
     return {
       imgFile: [],
@@ -255,7 +249,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         pid: null,
-        toUrl:null,
+        toUrl: null,
         cateName: null,
         sort: null,
         beginTime: null,
@@ -269,7 +263,9 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        toUrl: [{ required: true, message: "跳转链接不能为空", trigger: "blur" }],
+        toUrl: [
+          { required: true, message: "跳转链接不能为空", trigger: "blur" },
+        ],
         cateName: [
           { required: true, message: "分类名称不能为空", trigger: "blur" },
         ],
@@ -303,9 +299,6 @@ export default {
     });
   },
   methods: {
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.showOptions, row.isShow);
-    },
     handleRemove(file, fileList) {
       this.form.pic = [];
       this.imgFile = [];
@@ -331,9 +324,9 @@ export default {
     /** 查询商品分类列表 */
     getList() {
       this.loading = true;
-      getCategoryList().then((res) => {
-        this.cateNameList = res.data.categoryList;
-      });
+      // getCategoryList().then((res) => {
+      //   this.cateNameList = res.data.categoryList;
+      // });
       listCategory(this.addDateRange(this.queryParams, this.dateRange)).then(
         (response) => {
           this.categoryList = response.rows;
@@ -355,9 +348,9 @@ export default {
         pid: null,
         hoverPic: null,
         cateName: null,
-        toUrl:null,
+        toUrl: null,
         sort: null,
-        pic: null,
+        pic: [],
         isShow: null,
         addTime: null,
         upTime: null,
@@ -393,7 +386,7 @@ export default {
       const id = row.id || this.ids;
       getCategory(id).then((response) => {
         this.form = response.data;
-        this.imgFile.push({ url: response.data.pic, name: "Image" });
+        this.form.pic = [this.form.pic];
         this.open = true;
         this.title = "修改商品分类";
       });
@@ -402,14 +395,16 @@ export default {
     submitForm() {
       this.$refs["form"].validate((valid) => {
         if (valid) {
-          if (this.form.id != null) {
-            updateCategory(this.form).then((response) => {
+          let data = deepClone(this.form);
+          data.pic = data.pic.join(",");
+          if (data.id != null) {
+            updateCategory(data).then((response) => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addCategory(this.form).then((response) => {
+            addCategory(data).then((response) => {
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();

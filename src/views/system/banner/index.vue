@@ -104,7 +104,7 @@
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="序号" align="center" prop="id" />
-       <el-table-column label="排序" align="center" prop="bannerSort" />
+      <el-table-column label="排序" align="center" prop="bannerSort" />
       <el-table-column
         label="内容"
         align="center"
@@ -119,8 +119,13 @@
         label="展示状态"
         align="center"
         prop="bannerShow"
-        :formatter="statusFormat"
-      />
+      >
+      <template slot-scope="scope">
+        <el-tag
+          :type="scope.row.bannerShow == 0 ? 'info' : 'success'"
+          disable-transitions>{{scope.row.bannerShow == 0 ? '隐藏' : '显示'}}</el-tag>
+      </template>
+    </el-table-column>
       <!-- <el-table-column label="cdnjs" align="center" prop="bannerUrlJs" /> -->
       <!-- <el-table-column label="cdncs" align="center" prop="bannerUrlCss" /> -->
       <!-- <el-table-column label="轮播详情" align="center" prop="bannerSpecification" /> -->
@@ -180,21 +185,19 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改中间部分的banner图对话框 -->
+    <!-- 添加或修改海报对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="内容" prop="bannerName">
           <el-input
             type="textarea"
+            :rows="10"
             v-model="form.bannerName"
             placeholder="请输入内容"
           />
         </el-form-item>
-          <el-form-item label="排序" prop="bannerSort">
-          <el-input
-            v-model="form.bannerSort"
-            placeholder="请输入排序号"
-          />
+        <el-form-item label="排序" prop="bannerSort">
+          <el-input v-model="form.bannerSort" placeholder="请输入排序号" />
         </el-form-item>
         <el-form-item label="展示状态" prop="bannerShow">
           <el-radio-group v-model="form.bannerShow">
@@ -202,11 +205,13 @@
               v-for="dict in showOptions"
               :key="dict.dictValue"
               :label="dict.dictValue"
-              >{{dict.dictLabel}}</el-radio>
+              >{{ dict.dictLabel }}</el-radio
+            >
           </el-radio-group>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
+        <el-button type="info" @click="previewBanner">预览海报</el-button>
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
@@ -221,7 +226,6 @@ import {
   delBanner,
   addBanner,
   updateBanner,
-  exportBanner,
 } from "@/api/system/banner";
 import { formatString } from "@/api/system/public";
 
@@ -241,11 +245,11 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 中间部分的banner图表格数据
+      //海报表格数据
       bannerList: [],
       // 弹出层标题
       title: "",
-       // 日期范围
+      // 日期范围
       dateRange: [],
       // 是否显示弹出层
       open: false,
@@ -292,17 +296,24 @@ export default {
     });
   },
   methods: {
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.showOptions, row.bannerShow);
+    previewBanner() {
+      if (this.form.bannerName != null) {
+        localStorage.setItem("banner-setting", this.form.bannerName);
+        window.open("/banner.html");
+      } else {
+        this.$message.warning(`内容不能为空`);
+      }
     },
-    /** 查询中间部分的banner图列表 */
+    /** 查询海报列表 */
     getList() {
       this.loading = true;
-      listBanner(this.addDateRange(this.queryParams, this.dateRange)).then((response) => {
-        this.bannerList = response.rows;
-        this.total = response.total;
-        this.loading = false;
-      });
+      listBanner(this.addDateRange(this.queryParams, this.dateRange)).then(
+        (response) => {
+          this.bannerList = response.rows;
+          this.total = response.total;
+          this.loading = false;
+        }
+      );
     },
     // 取消按钮
     cancel() {
@@ -350,7 +361,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加中间部分的banner图";
+      this.title = "添加海报";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -359,7 +370,7 @@ export default {
       getBanner(id).then((response) => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改中间部分的banner图";
+        this.title = "修改海报";
       });
     },
     /** 提交按钮 */
@@ -386,36 +397,17 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm(
-        '是否确认删除中间部分的banner图编号为"' + ids + '"的数据项?',
-        "警告",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-        }
-      )
+      this.$confirm('是否确认删除海报编号为"' + ids + '"的数据项?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
         .then(function () {
           return delBanner(ids);
         })
         .then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        });
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm("是否确认导出所有中间部分的banner图数据项?", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(function () {
-          return exportBanner(queryParams);
-        })
-        .then((response) => {
-          this.download(response.msg);
         });
     },
   },

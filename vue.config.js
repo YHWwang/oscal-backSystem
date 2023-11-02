@@ -115,9 +115,9 @@ module.exports = {
       .use('url-loader')
       .loader('url-loader')
       .tap(options => Object.assign(options, { limit: 10240 })).end()
-      .use('image-webpack-loader').loader('image-webpack-loader').options({
-        bypassOnDebug: true
-      }).end()
+      // .use('image-webpack-loader').loader('image-webpack-loader').options({
+      //   bypassOnDebug: true
+      // }).end()
     // set svg-sprite-loader
     config.module
       .rule('svg')

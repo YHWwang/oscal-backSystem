@@ -1,0 +1,72 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .banner-main .swiper-wrapper {
+            height: inherit;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="#AMain">
+        <link rel="stylesheet"
+            href="https://d2kbvjszk9d5ln.cloudfront.net/yshop/icon/other/common-20231023051910892.css" />
+        <link rel="stylesheet"
+            href="https://d2kbvjszk9d5ln.cloudfront.net/yshop/upload/other/swiper.min-2021122509475779.css" />
+
+        <div class="oscal-swiper-container banner-main swiper-container-horizontal swiper">
+            <div class="swiper-wrapper">
+            </div>
+            <!-- Add Arrows -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <!-- Add Pagination -->
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</body>
+
+<script src="https://d2kbvjszk9d5ln.cloudfront.net/yshop/upload/other/jquery-3.3.1.min-20201130021002922.js"></script>
+<script src="https://d2kbvjszk9d5ln.cloudfront.net/yshop/upload/other/lazysizes.min-20201204070627489.js"></script>
+<script src="https://d2kbvjszk9d5ln.cloudfront.net/yshop/icon/other/swiper.min-20231023050757290.js"></script>
+<script>
+    $(function () {
+        if(localStorage['banner-setting']) {
+            document.querySelector('.oscal-swiper-container .swiper-wrapper').innerHTML = localStorage['banner-setting']
+            new Swiper(".swiper", {
+                autoplay: true,
+                centeredSlides: true,
+                loop: true,
+                observer: true,
+                observeParents: true,
+
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+            });
+            $(".banner-item").click(function (e) {
+                var href = $(this).attr("data-href");
+                console.log(href);
+                if (href) {
+                    if (e.target.nodeName != "SPAN" && e.target.nodeName != "A") {
+                        window.open(href);
+                    }
+                }
+            });
+            window.onbeforeunload = function () {
+                localStorage.removeItem('banner-setting')
+            }
+        } else{
+            alert('资源已清理，重新从后台系统顶部轮播预览进入')
+        }
+    })
+</script>

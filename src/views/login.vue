@@ -10,6 +10,7 @@
       <el-form-item prop="password">
         <el-input
           v-model="loginForm.password"
+          show-password
           type="password"
           auto-complete="off"
           placeholder="密码"

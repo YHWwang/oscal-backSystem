@@ -38,6 +38,7 @@
       <el-col :span="24">
         <el-table
           :data="tableData"
+          height="350"
           border
           show-summary
           style="width: 70%; margin: 0 auto"
