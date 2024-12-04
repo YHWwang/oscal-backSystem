@@ -136,22 +136,16 @@
       <el-table-column label="商品id" align="center" prop="id" />
       <el-table-column label="商品图片" align="center">
         <template slot-scope="scope">
-          <el-image 
+          <el-image
             style="width: 100px; height: 100px"
-            :src="formatImg(scope.row.image)" 
-            :preview-src-list="[formatImg(scope.row.image)]">
+            :src="formatImg(scope.row.image)"
+            :preview-src-list="[formatImg(scope.row.image)]"
+          >
           </el-image>
         </template>
       </el-table-column>
       <el-table-column label="商品名称" align="center" prop="storeName" />
       <el-table-column label="产品类别" sortable align="center" prop="cateId" />
-      <!-- <el-table-column
-        label="轮播图"
-        align="center"
-        prop="sliderImage"
-        show-overflow-tooltip
-      /> -->
-
       <el-table-column
         label="商品简介"
         align="center"
@@ -172,12 +166,14 @@
         align="center"
         prop="isPostage"
       >
-      <template slot-scope="scope">
-        <el-tag
-          :type="scope.row.isPostage == 0 ? 'info' : 'success'"
-          disable-transitions>{{scope.row.isPostage == 0 ? '下架' : '上架'}}</el-tag>
-      </template>
-    </el-table-column>
+        <template slot-scope="scope">
+          <el-tag
+            :type="scope.row.isPostage == 0 ? 'info' : 'success'"
+            disable-transitions
+            >{{ scope.row.isPostage == 0 ? "下架" : "上架" }}</el-tag
+          >
+        </template>
+      </el-table-column>
 
       <el-table-column
         label="操作"
@@ -255,7 +251,7 @@
         <el-form-item label="商品图片" prop="image">
           <MaterialList v-model="form.image" type="image" :num="4" />
         </el-form-item>
-        <el-form-item label="pc产品封面图" prop="hotImage">
+        <!-- <el-form-item label="pc产品封面图" prop="hotImage">
           <MaterialList v-model="form.hotImage" type="image" :num="1" />
           <p>
             TIGER系列590*320(备注：首张590*660)；S系列386*560；Pad系列590*660,储能系列590*660
@@ -263,7 +259,7 @@
         </el-form-item>
         <el-form-item label="app产品封面图" prop="sliderImage">
           <MaterialList v-model="form.sliderImage" type="image" :num="1" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="产品标签" prop="status">
           <el-select v-model="form.status" placeholder="请选择产品标签">
             <el-option :key="0" label="普通" :value="0" />
@@ -286,6 +282,14 @@
         </el-form-item>
         <el-form-item label="产品购买链接" prop="soureLink">
           <el-input v-model="form.soureLink" placeholder="请输入产品购买链接" />
+        </el-form-item>
+        <el-form-item label="详情购买按钮组" prop="buyButtons">
+          <el-input
+            v-model="form.buyButtons"
+            type="textarea"
+            :rows="10"
+            placeholder="详情购买按钮组"
+          />
         </el-form-item>
         <!-- <el-form-item label="跳转url" prop="productUrl">
           <el-input v-model="form.productUrl" placeholder="请输入跳转url" />
@@ -387,42 +391,21 @@ export default {
         keyword: null,
         barCode: null,
         cateId: null,
-        price: null,
-        vipPrice: null,
-        otPrice: null,
+
         postage: null,
         fileIndex: null,
         sort: null,
-        sales: null,
-        stock: null,
-        isShow: null,
-        isHot: null,
-        isBenefit: null,
-        isBest: null,
-        isNew: null,
+
         description: null,
-        isDel: null,
-        merUse: null,
-        giveIntegral: null,
-        cost: null,
-        isSeckill: null,
-        isBargain: null,
-        isGood: null,
-        ficti: null,
-        browse: null,
-        codePath: null,
+
         soureLink: null,
         hotImage: null,
         productUrl: null,
         specification: null,
-        recommond: null,
-        cateShopId: null,
-        productDescription: null,
         seoTitle: null,
         seoKeywords: null,
-        productTitle: null,
         productRepresent: null,
-        productKeyword: null,
+
         seriesId: null,
         status: 0,
       },
@@ -521,22 +504,11 @@ export default {
         id: null,
         merId: null,
         image: [],
-        sliderImage: [],
         storeName: null,
         storeInfo: null,
-        price: null,
-        vipPrice: null,
-        otPrice: null,
         postage: null,
         fileIndex: null,
         sort: null,
-        sales: null,
-        stock: null,
-        isShow: null,
-        isHot: null,
-        isBenefit: null,
-        isBest: null,
-        isNew: null,
         description: `
         <div class="main" id="">
             <p style="text-align: center;width: 100%;font-size: 54px;padding: 10vw 0;">
@@ -550,19 +522,34 @@ export default {
         `,
         addTime: null,
         isPostage: null,
-        isDel: null,
-        merUse: null,
-        giveIntegral: null,
-        cost: null,
-        isSeckill: null,
-        isBargain: null,
-        isGood: null,
-        ficti: null,
-        browse: null,
-        codePath: null,
         soureLink: null,
-        hotImage: [],
-        productUrl: null,
+        buyButtons: `<div class="list-up">
+	<span>CLICK TO BUY</span>
+	<span class="up-icon"></span>
+</div>
+<div class="list-btn ">
+	<a href="" target="_blank">
+		BUY NOW
+	</a>
+	<a href="" target="_blank">
+		UK
+	</a>
+	<a href="" target="_blank">
+		DE
+	</a>
+	<a href="" target="_blank">
+		FR
+	</a>
+	<a href="" target="_blank">
+		IT
+	</a>
+	<a href="" target="_blank">
+		ES
+	</a>
+	<a href="" target="_blank">
+		US
+	</a>
+</div>`,
         specification: `
         <div class="products_spesc">
             <div class="spesc-img-left">
@@ -615,14 +602,9 @@ export default {
             </div>
         </div>
         `,
-        recommond: null,
-        cateShopId: null,
-        productDescription: null,
         seoTitle: null,
         seoKeywords: null,
-        productTitle: null,
         productRepresent: null,
-        productKeyword: null,
         seriesId: null,
       };
       this.resetForm("form");
@@ -657,14 +639,7 @@ export default {
       const id = row.id || this.ids;
       getProduct(id).then((response) => {
         response.data.image = response.data.image.split(",");
-        response.data.sliderImage =
-          response.data.sliderImage.length > 0
-            ? [response.data.sliderImage]
-            : [];
-        response.data.hotImage =
-          response.data.hotImage.length > 0 ? [response.data.hotImage] : [];
         this.form = response.data;
-        // this.imgFile.push({ url: response.data.image, name: "Image" });
         this.open = true;
         this.title = "修改商品";
       });
@@ -675,8 +650,6 @@ export default {
         if (valid) {
           let data = deepClone(this.form);
           data.image = data.image.join(",");
-          data.sliderImage = data.sliderImage.join(",");
-          data.hotImage = data.hotImage.join(",");
           if (data.id != null) {
             let cateNameList = "";
             getCategoryList().then((res) => {

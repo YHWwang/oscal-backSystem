@@ -162,13 +162,13 @@ export default {
       // 表单校验
       rules: {
         categoryId: [
-          { required: true, message: "首页状态0显示1隐藏不能为空", trigger: "blur" }
+          { required: true, message: "上级不能为空", trigger: "blur" }
         ],
         seriesName: [
-          { required: true, message: "首页状态0显示1隐藏不能为空", trigger: "blur" }
+          { required: true, message: "分类名称不能为空", trigger: "blur" }
         ],
         status: [
-          { required: true, message: "分类状态 0显示1隐藏不能为空", trigger: "blur" }
+          { required: true, message: "分类状态不能为空", trigger: "blur" }
         ],
         indexStatus: [
           { required: true, message: "首页状态0显示1隐藏不能为空", trigger: "blur" }

@@ -17,6 +17,7 @@
     </el-row>
     <el-table v-loading="loading" :data="topBannerList">
       <el-table-column label="ID" align="center" width="55" prop="id" />
+      <el-table-column label="标题" align="center" prop="title" />
       <el-table-column label="顶部图片pc" align="center" prop="pcImgUrl" >
         <template slot-scope="scope">
           <el-image 
@@ -69,6 +70,9 @@
     <!-- 添加或修改topBanner对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="form.title" placeholder="请输入" />
+        </el-form-item>
         <el-form-item label="顶部图片pc" prop="pcImgUrl">
           <!-- <el-input v-model="form.pcImgUrl" placeholder="请输入顶部图片pc" /> -->
           <MaterialList
@@ -109,6 +113,7 @@ import {
   getTopBanner,
   updateTopBanner,
   delTopBanner,
+  addTopBanner
 } from "@/api/system/topBanner";
 import { deepClone } from "@/utils/index";
 import MaterialList from "@/components/material";
@@ -195,6 +200,7 @@ export default {
         createTime: null,
         status: 0,
         sortNum: null,
+        title:''
       };
       this.resetForm("form");
     },
@@ -233,11 +239,19 @@ export default {
           let data = deepClone(this.form);
           data.pcImgUrl = this.form.pcImgUrl[0];
           data.appImgUrl = this.form.appImgUrl[0];
+          if(this.form.id){
           updateTopBanner(data).then((response) => {
             this.msgSuccess("修改成功");
             this.open = false;
             this.getList();
           });
+          }else{
+            addTopBanner(data).then(response => {
+              this.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
+            });
+          }
         }
       });
     },

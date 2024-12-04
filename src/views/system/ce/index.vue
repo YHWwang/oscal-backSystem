@@ -8,7 +8,7 @@
       @submit.native.prevent
       label-width="128px"
     >
-    <el-form-item label="文件名" prop="fileName">
+      <el-form-item label="文件名" prop="fileName">
         <el-input
           v-model="queryParams.fileName"
           placeholder="请输入文件名"
@@ -61,9 +61,15 @@
 
     <el-table v-loading="loading" :data="ceList">
       <!-- <el-table-column type="selection" width="55" align="center" /> -->
-      <el-table-column label="文件名" align="center" prop="fileName" >
+      <el-table-column label="文件名" align="center" prop="fileName">
         <template slot-scope="scope">
-          <a style="color: #46a6ff;" :href="scope.row.fileUrl" target="_blank" rel="noopener noreferrer">{{scope.row.fileName}}</a>
+          <a
+            style="color: #46a6ff"
+            :href="scope.row.fileUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            >{{ scope.row.fileName }}</a
+          >
         </template>
       </el-table-column>
       <el-table-column label="文件类型" align="center" prop="type" />
@@ -112,11 +118,42 @@
     />
 
     <!-- 添加或修改CE证书对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="文件名" prop="fileName">
           <el-input v-model="form.fileName" placeholder="请输入文件名" />
         </el-form-item>
+
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="产品类别" prop="cateId">
+              <el-select
+                v-model="form.cateId"
+                @change="changeCateId"
+                placeholder="请选择产品类别"
+              >
+                <el-option
+                  v-for="dict in cateNameList"
+                  :key="dict.id"
+                  :label="dict.cate_name"
+                  :value="dict.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="产品系列" prop="seriesId">
+              <el-select v-model="form.seriesId" placeholder="请选择产品系列">
+                <el-option
+                  v-for="res in seriesList"
+                  :key="res.id"
+                  :label="res.name"
+                  :value="res.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item v-if="!form.id" label="文件" prop="fileUrl">
           <input type="file" id="file" />
         </el-form-item>
@@ -145,10 +182,13 @@
 <script>
 import { listCe, getCe, delCe, addCe, updateCe } from "@/api/system/ce";
 
+import { getCategoryList, getSeries } from "@/api/system/product";
 export default {
   name: "Ce",
   data() {
     return {
+      cateNameList: [],
+      seriesList: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -177,6 +217,7 @@ export default {
         size: null,
         sortNum: null,
         status: null,
+        cateId: null,
       },
       // 表单参数
       form: {},
@@ -185,16 +226,49 @@ export default {
         fileName: [
           { required: true, message: "文件名不能为空", trigger: "blur" },
         ],
+        cateId: [
+          { required: true, message: "产品类别不能为空", trigger: "blur" },
+        ],
+        seriesId: [
+          { required: true, message: "产品系列不能为空", trigger: "blur" },
+        ],
       },
     };
   },
   created() {
     this.getList();
   },
+
+  watch: {
+    "form.cateId": function (newVal, oldVal) {
+      if (newVal && newVal !== oldVal) {
+        getSeries(this.form.cateId).then((res) => {
+          this.seriesList = res.data;
+        });
+      }
+    },
+    "queryParams.cateId": function (newVal, oldVal) {
+      if (newVal && newVal !== oldVal) {
+        getSeries(this.queryParams.cateId).then((res) => {
+          this.seriesList = res.data;
+        });
+      }
+    },
+  },
   methods: {
+    changeCateId() {
+      this.form.seriesId = null;
+    },
+    changeQueryCateId() {
+      this.queryParams.seriesId = null;
+    },
     /** 查询CE证书列表 */
     getList() {
       this.loading = true;
+
+      getCategoryList().then((res) => {
+        this.cateNameList = res.data.categoryList;
+      });
       listCe(this.queryParams).then((response) => {
         this.ceList = response.rows;
         this.total = response.total;
@@ -208,7 +282,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-       this.dateRange = [];
+      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -227,6 +301,8 @@ export default {
         size: null,
         sortNum: 0,
         status: 0,
+        seriesId: null,
+        cateId: null,
         createTime: null,
       };
       this.resetForm("form");
@@ -271,6 +347,8 @@ export default {
             formData.append("sortNum", this.form.sortNum);
             formData.append("fileName", this.form.fileName);
             formData.append("status", this.form.status);
+            formData.append("cateId", this.form.cateId);
+            formData.append("seriesId", this.form.seriesId);
             formData.append("file", dom);
             addCe(formData).then((response) => {
               this.msgSuccess("新建成功");
