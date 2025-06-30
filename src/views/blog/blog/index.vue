@@ -534,7 +534,6 @@ export default {
           form.bannerUrl = form.bannerUrl ? form.bannerUrl.join() : "";
           form.level2Id = form.level1Id[1];
           form.level1Id = form.level1Id[0];
-          console.log(form);
           if (form.id != null) {
             updateBlog(form).then((response) => {
               this.msgSuccess("修改成功");
