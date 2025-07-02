@@ -191,7 +191,12 @@
           </el-cascader>
         </el-form-item>
         <el-form-item label="封面图" prop="coverImage">
-          <Upload :value="form.coverImage" :pw="900" :ph="500" />
+          <Upload :value="form.coverImage" />
+          <el-input
+            v-model="form.coverImage"
+            type="textarea"
+            placeholder="请输入内容"
+          />
         </el-form-item>
         <el-form-item label="博客标题" prop="blogTitle">
           <el-input v-model="form.blogTitle" placeholder="请输入博客标题" />
@@ -309,7 +314,12 @@
           prop="bannerUrl"
           v-show="form.isBanner == 1"
         >
-          <Upload :value="form.bannerUrl" :pw="1920" :ph="600" />
+          <Upload :value="form.bannerUrl" />
+          <el-input
+            v-model="form.bannerUrl"
+            type="textarea"
+            placeholder="请输入内容"
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -412,6 +422,15 @@ export default {
   created() {
     this.getList();
     this.getCategoryOptions();
+  },
+  watch: {
+    "form.blogRoute": function (val) {
+      var str = "";
+      str = val.replace(/[^a-zA-Z0-9]+/gi, "-").toLowerCase(); // 正则去除非字母外的其他字符
+      str = str.startsWith("-") ? str.substring(1) : str; // 去除首“-”
+      str = str.endsWith("-") ? str.substring(0, str.length - 1) : str; // 去除尾“-”
+      this.form.blogRoute = str;
+    },
   },
   methods: {
     // 获取分类下拉数据

@@ -136,7 +136,7 @@
         <el-form-item label="排序" prop="sortNum">
           <el-input-number
             :step="1"
-            :min='0'
+            :min="0"
             step-strictly
             v-model="form.sortNum"
             placeholder="请输入排序"
@@ -218,6 +218,15 @@ export default {
   },
   created() {
     this.getList();
+  },
+  watch: {
+    "form.route": function (val) {
+      var str = "";
+      str = val.replace(/[^a-zA-Z0-9]+/gi, "-").toLowerCase(); // 正则去除非字母外的其他字符
+      str = str.startsWith("-") ? str.substring(1) : str; // 去除首“-”
+      str = str.endsWith("-") ? str.substring(0, str.length - 1) : str; // 去除尾“-”
+      this.form.route = str;
+    },
   },
   methods: {
     /** 查询博客分类列表 */
