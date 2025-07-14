@@ -63,6 +63,9 @@ export default {
     value: {
       default: [],
     },
+    type:{
+      type:String,
+    },
     num: {
       default: 1,
     },
@@ -166,6 +169,9 @@ export default {
     // 图片上传
     handleUploadSuccess(response, file, fileList) {
       this.value.push(fileList[0].response.url);
+      if(this.type){
+        this.$emit("backFun",fileList[0].response.url,this.type)
+      }
       this.$refs.upload.clearFiles();
     },
   },
