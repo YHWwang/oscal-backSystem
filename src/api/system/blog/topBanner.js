@@ -1,52 +1,52 @@
 import request from '@/utils/request'
 
-// 查询topBanner列表
-export function listTopBanner(query) {
+// 查询blog顶部广告列表
+export function listBlogTopImg(query) {
   return request({
-    url: '/system/topBanner/list',
+    url: '/system/blogTopImg/list',
     method: 'get',
     params: query
   })
 }
 
-// 查询topBanner详细
-export function getTopBanner(id) {
+// 查询blog顶部广告详细
+export function getBlogTopImg(id) {
   return request({
-    url: '/system/topBanner/' + id,
+    url: '/system/blogTopImg/' + id,
     method: 'get'
   })
 }
 
-// 新增topBanner
-export function addTopBanner(data) {
+// 新增blog顶部广告
+export function addBlogTopImg(data) {
   return request({
-    url: '/system/topBanner',
+    url: '/system/blogTopImg',
     method: 'post',
     data: data
   })
 }
 
-// 修改topBanner
-export function updateTopBanner(data) {
+// 修改blog顶部广告
+export function updateBlogTopImg(data) {
   return request({
-    url: '/system/topBanner',
+    url: '/system/blogTopImg',
     method: 'put',
     data: data
   })
 }
 
-// 删除topBanner
-export function delTopBanner(id) {
+// 删除blog顶部广告
+export function delBlogTopImg(id) {
   return request({
-    url: '/system/topBanner/' + id,
+    url: '/system/blogTopImg/' + id,
     method: 'delete'
   })
 }
 
-// 导出topBanner
-export function exportTopBanner(query) {
+// 导出blog顶部广告
+export function exportBlogTopImg(query) {
   return request({
-    url: '/system/topBanner/export',
+    url: '/system/blogTopImg/export',
     method: 'get',
     params: query
   })

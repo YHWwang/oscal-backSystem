@@ -1,5 +1,46 @@
 <template>
   <div class="app-container">
+    <el-form
+      :model="queryParams"
+      ref="queryForm"
+      :inline="true"
+      v-show="showSearch"
+      label-width="128px"
+    >
+      <el-form-item label="标题" prop="title">
+        <el-input
+          v-model="queryParams.title"
+          placeholder="请输入标题"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="显示状态" prop="status">
+        <el-select
+          v-model="queryParams.status"
+          placeholder="请选择显示状态"
+          clearable
+          size="small"
+        >
+          <el-option label="显示" value="0" />
+          <el-option label="隐藏" value="1" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button
+          type="cyan"
+          icon="el-icon-search"
+          size="mini"
+          @click="handleQuery"
+          >搜索</el-button
+        >
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery"
+          >重置</el-button
+        >
+      </el-form-item>
+    </el-form>
+
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
@@ -7,36 +48,34 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
+          v-hasPermi="['system:blogTopImg:add']"
           >新增</el-button
         >
       </el-col>
-      <right-toolbar
-        :showSearch.sync="showSearch"
-        @queryTable="getList"
-      ></right-toolbar>
     </el-row>
-    <el-table v-loading="loading" :data="topBannerList">
-      <el-table-column label="ID" align="center" width="55" prop="id" />
+
+    <el-table v-loading="loading" :data="blogTopImgList">
       <el-table-column label="标题" align="center" prop="title" />
-      <el-table-column label="顶部图片pc" align="center" prop="pcImgUrl" >
+      <el-table-column label="顶部图片pc" align="center" prop="pcImgUrl">
         <template slot-scope="scope">
-          <el-image 
-            :src="scope.row.pcImgUrl" 
-            :preview-src-list="[scope.row.pcImgUrl]">
+          <el-image
+            :src="scope.row.pcImgUrl"
+            :preview-src-list="[scope.row.pcImgUrl]"
+          >
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column label="顶部图片app" align="center" prop="appImgUrl" >
+      <el-table-column label="顶部图片app" align="center" prop="appImgUrl">
         <template slot-scope="scope">
-          <el-image 
-            :src="scope.row.appImgUrl" 
-            :preview-src-list="[scope.row.appImgUrl]">
+          <el-image
+            :src="scope.row.appImgUrl"
+            :preview-src-list="[scope.row.appImgUrl]"
+          >
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column label="跳转链接" align="center" prop="jumpUrl" />
-      <el-table-column label="创建时间" align="center" prop="createTime" />
-      <el-table-column label="状态" align="center" prop="status" >
+      <el-table-column label="链接地址" align="center" prop="jumpUrl" />
+      <el-table-column label="显示状态" align="center" prop="status" >
         <template slot-scope="scope">
           <el-tag :type="scope.row.status ? 'info':'success'">{{scope.row.status ? '隐藏':'显示'}}</el-tag>
         </template>
@@ -52,20 +91,21 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:topBanner:edit']"
+            v-hasPermi="['system:blogTopImg:edit']"
             >修改</el-button
           >
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-edit"
+            icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['system:topBanner:remove']"
+            v-hasPermi="['system:blogTopImg:remove']"
             >删除</el-button
           >
         </template>
       </el-table-column>
     </el-table>
+
     <pagination
       v-show="total > 0"
       :total="total"
@@ -73,32 +113,25 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-    <!-- 添加或修改topBanner对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+
+    <!-- 添加或修改blog顶部广告对话框 -->
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="标题" prop="title">
-          <el-input v-model="form.title" placeholder="请输入" />
+          <el-input v-model="form.title" placeholder="请输入标题" />
         </el-form-item>
-        <el-form-item label="顶部图片pc" prop="pcImgUrl">
-          <!-- <el-input v-model="form.pcImgUrl" placeholder="请输入顶部图片pc" /> -->
-          <MaterialList
-            v-model="form.pcImgUrl"
-            type="image"
-            :num="1"
-          />
+        <el-form-item label="pc图片" prop="pcImgUrl">
+          <el-input v-model="form.pcImgUrl" placeholder="请输入顶部图片pc" />
+          <span>PC端图片：1920px*90px</span>
         </el-form-item>
-        <el-form-item label="顶部图片app" prop="appImgUrl">
-          <!-- <el-input v-model="form.appImgUrl" placeholder="请输入顶部图片app" /> -->
-          <MaterialList
-            v-model="form.appImgUrl"
-            type="image"
-            :num="1"
-          />
+        <el-form-item label="app图片" prop="appImgUrl">
+          <el-input v-model="form.appImgUrl" placeholder="请输入顶部图片app" />
+          <span>移动端图片：750px*100px</span>
         </el-form-item>
-        <el-form-item label="跳转链接" prop="jumpUrl">
-          <el-input v-model="form.jumpUrl" placeholder="请输入跳转链接" />
+        <el-form-item label="链接地址" prop="jumpUrl">
+          <el-input v-model="form.jumpUrl" placeholder="请输入链接地址" />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
+        <el-form-item label="显示状态" prop="status">
           <el-radio-group v-model="form.status">
             <el-radio :label="0">显示</el-radio>
             <el-radio :label="1">隐藏</el-radio>
@@ -115,19 +148,15 @@
 
 <script>
 import {
-  listTopBanner,
-  getTopBanner,
-  updateTopBanner,
-  delTopBanner,
-  addTopBanner
+  listBlogTopImg,
+  getBlogTopImg,
+  delBlogTopImg,
+  addBlogTopImg,
+  updateBlogTopImg,
 } from "@/api/system/blog/topBanner";
-import { deepClone } from "@/utils/index";
-import MaterialList from "@/components/material";
 
 export default {
-  name: "TopBanner",
-
-  components: { MaterialList },
+  name: "BlogTopImg",
   data() {
     return {
       // 遮罩层
@@ -142,8 +171,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // topBanner表格数据
-      topBannerList: [],
+      // blog顶部广告表格数据
+      blogTopImgList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -152,9 +181,11 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        title: null,
         pcImgUrl: null,
         appImgUrl: null,
         jumpUrl: null,
+        status: null,
       },
       // 表单参数
       form: {},
@@ -167,7 +198,7 @@ export default {
           { required: true, message: "顶部图片app不能为空", trigger: "blur" },
         ],
         jumpUrl: [
-          { required: true, message: "顶部图片app不能为空", trigger: "blur" },
+          { required: true, message: "链接地址不能为空", trigger: "blur" },
         ],
       },
     };
@@ -176,17 +207,11 @@ export default {
     this.getList();
   },
   methods: {
-    /** 新增按钮操作 */
-    handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加广告";
-    },
-    /** 查询topBanner列表 */
+    /** 查询blog顶部广告列表 */
     getList() {
       this.loading = true;
-      listTopBanner(this.queryParams).then((response) => {
-        this.topBannerList = response.rows;
+      listBlogTopImg(this.queryParams).then((response) => {
+        this.blogTopImgList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -200,59 +225,53 @@ export default {
     reset() {
       this.form = {
         id: null,
-        pcImgUrl: [],
-        appImgUrl: [],
+        title: null,
+        pcImgUrl: null,
+        appImgUrl: null,
         jumpUrl: null,
+        status: 1,
         createTime: null,
-        status: 0,
-        sortNum: null,
-        title:''
       };
       this.resetForm("form");
+    },
+    /** 搜索按钮操作 */
+    handleQuery() {
+      this.queryParams.pageNum = 1;
+      this.getList();
+    },
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.resetForm("queryForm");
+      this.handleQuery();
+    },
+    /** 新增按钮操作 */
+    handleAdd() {
+      this.reset();
+      this.open = true;
+      this.title = "添加blog顶部广告";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids;
-      getTopBanner(id).then((response) => {
+      getBlogTopImg(id).then((response) => {
         this.form = response.data;
-        this.form.appImgUrl = [this.form.appImgUrl];
-        this.form.pcImgUrl = [this.form.pcImgUrl];
         this.open = true;
-        this.title = "修改topBanner";
+        this.title = "修改blog顶部广告";
       });
-    },
-    /** 删除按钮操作 */
-    handleDelete(row) {
-      const ids = row.id || this.ids;
-      this.$confirm('是否确认删除广告编号为"' + ids + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(function () {
-          return delTopBanner(ids);
-        })
-        .then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        });
     },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate((valid) => {
         if (valid) {
-          let data = deepClone(this.form);
-          data.pcImgUrl = this.form.pcImgUrl[0];
-          data.appImgUrl = this.form.appImgUrl[0];
-          if(this.form.id){
-          updateTopBanner(data).then((response) => {
-            this.msgSuccess("修改成功");
-            this.open = false;
-            this.getList();
-          });
-          }else{
-            addTopBanner(data).then(response => {
+          if (this.form.id != null) {
+            updateBlogTopImg(this.form).then((response) => {
+              this.msgSuccess("修改成功");
+              this.open = false;
+              this.getList();
+            });
+          } else {
+            addBlogTopImg(this.form).then((response) => {
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -260,6 +279,26 @@ export default {
           }
         }
       });
+    },
+    /** 删除按钮操作 */
+    handleDelete(row) {
+      const ids = row.id || this.ids;
+      this.$confirm(
+        '是否确认删除blog顶部广告编号为"' + ids + '"的数据项?',
+        "警告",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(function () {
+          return delBlogTopImg(ids);
+        })
+        .then(() => {
+          this.getList();
+          this.msgSuccess("删除成功");
+        });
     },
   },
 };

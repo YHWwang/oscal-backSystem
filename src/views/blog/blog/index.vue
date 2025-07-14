@@ -191,9 +191,10 @@
           </el-cascader>
         </el-form-item>
         <el-form-item label="封面图" prop="coverImage">
-          <Upload :value="form.coverImage" />
+          <Upload :value="form.coverImage" type='coverImageinput' @backFun="successHandle" />
           <el-input
-            v-model="form.coverImage"
+            v-model="form.coverImageinput"
+            @change="inputChange(form.coverImageinput,'coverImage')"
             type="textarea"
             placeholder="请输入内容"
           />
@@ -222,6 +223,9 @@
         </el-form-item>
         <el-form-item label="seo标题" prop="seoTitle">
           <el-input v-model="form.seoTitle" placeholder="请输入seo标题" />
+        </el-form-item>
+        <el-form-item label="图片Alt" prop="coverImageAlt">
+          <el-input v-model="form.coverImageAlt" placeholder="图片Alt" />
         </el-form-item>
         <el-form-item label="seo描述" prop="seoDescription">
           <el-input
@@ -314,9 +318,10 @@
           prop="bannerUrl"
           v-show="form.isBanner == 1"
         >
-          <Upload :value="form.bannerUrl" />
+          <Upload :value="form.bannerUrl" type='bannerUrlInput' @backFun="successHandle" />
           <el-input
-            v-model="form.bannerUrl"
+            v-model="form.bannerUrlInput"
+            @change="inputChange(form.bannerUrlInput,'bannerUrl')"
             type="textarea"
             placeholder="请输入内容"
           />
@@ -388,7 +393,7 @@ export default {
           { required: true, message: "二级分类不能为空", trigger: "blur" },
         ],
         coverImage: [
-          { required: true, message: "封面图不能为空", trigger: "blur" },
+          { required: true, message: "封面图不能为空", trigger: "change" },
         ],
         blogTitle: [
           { required: true, message: "博客标题不能为空", trigger: "blur" },
@@ -425,14 +430,24 @@ export default {
   },
   watch: {
     "form.blogRoute": function (val) {
-      var str = "";
-      str = val.replace(/[^a-zA-Z0-9]+/gi, "-").toLowerCase(); // 正则去除非字母外的其他字符
-      str = str.startsWith("-") ? str.substring(1) : str; // 去除首“-”
-      str = str.endsWith("-") ? str.substring(0, str.length - 1) : str; // 去除尾“-”
-      this.form.blogRoute = str;
+      if (val) {
+        var str = "";
+        str = val.replace(/[^a-zA-Z0-9]+/gi, "-").toLowerCase(); // 正则去除非字母外的其他字符
+        str = str.startsWith("-") ? str.substring(1) : str; // 去除首“-”
+        str = str.endsWith("-") ? str.substring(0, str.length - 1) : str; // 去除尾“-”
+        this.form.blogRoute = str;
+      }
     },
   },
   methods: {
+    // 图片Input地址改变
+    inputChange(val,type) {
+      this.form[type] = val?[val]:[];
+    },
+    // 图片组件上传回调
+    successHandle(val,type) {
+      this.form[type] = val;
+    },
     // 获取分类下拉数据
     getCategoryOptions() {
       getCategory().then((res) => {
@@ -491,12 +506,14 @@ export default {
         level1Id: null,
         level2Id: null,
         coverImage: [],
+        coverImageinput: "",
         blogTitle: null,
         blogDescription: null,
         blogContent: null,
         blogRoute: null,
         seoTitle: null,
         seoDescription: null,
+        coverImageAlt: null,
         isShow: null,
         isHot: null,
         hotSortNum: null,
@@ -505,6 +522,7 @@ export default {
         isBanner: null,
         bannerSortNum: null,
         bannerUrl: [],
+        bannerUrlInput: "",
       };
       this.resetForm("form");
     },
@@ -536,7 +554,9 @@ export default {
       const id = row.id || this.ids;
       getBlog(id).then((response) => {
         let data = response.data;
+        data.coverImageinput = data.coverImage
         data.coverImage = data.coverImage ? [data.coverImage] : [];
+        data.bannerUrlInput = data.bannerUrl
         data.bannerUrl = data.bannerUrl ? [data.bannerUrl] : [];
         data.level1Id = [data.level1Id, data.level2Id];
         this.form = data;
