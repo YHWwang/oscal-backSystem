@@ -51,6 +51,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
+            v-hasPermi="['system:recom:add']"
         >新增</el-button
         >
       </el-col>
@@ -60,12 +61,7 @@
       <el-table-column label="搜索名称" align="center" prop="homeName"/>
 
 
-      <el-table-column label="搜索链接" align="center" prop="homeUrl" >
-        <template slot-scope="scope">
-          <a :href="scope.row.homeUrl" style="color: blue" target="_blank"
-          >{{scope.row.homeUrl}}</a>
-        </template>
-      </el-table-column>
+      <el-table-column label="搜索链接" align="center" prop="homeUrl" />
       <el-table-column label="排序" align="center" prop="sort" />
       <el-table-column label="状态" align="center" prop="isShow">
         <template slot-scope="scope">
@@ -87,6 +83,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
+            v-hasPermi="['system:recom:edit']"
           >修改</el-button
           >
           <el-button
@@ -94,6 +91,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
+            v-hasPermi="['system:recom:remove']"
           >删除</el-button
           >
         </template>
@@ -120,7 +118,7 @@
         :rules="rules"
         label-width="120px"
       >
-        <el-form-item label="搜索标题" prop="homeUrl">
+        <el-form-item label="搜索标题" prop="homeName">
           <el-input v-model="form.homeName" placeholder="请输入标题" />
         </el-form-item>
         <el-form-item label="搜索链接" prop="homeUrl">

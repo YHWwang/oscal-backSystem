@@ -113,7 +113,7 @@
           <el-input v-model="form.name" placeholder="请输入分类名称" />
         </el-form-item>
         <el-form-item label="路由" prop="route">
-          <el-input v-model="form.route" placeholder="请输入路由" />
+          <el-input :disabled="form.id" v-model="form.route" placeholder="请输入路由" />
         </el-form-item>
         <el-form-item label="SEO标题" prop="seoTitle">
           <el-input v-model="form.seoTitle" placeholder="请输入SEO标题" />
@@ -207,6 +207,15 @@ export default {
         ],
       },
     };
+  },
+  watch: {
+    "form.route": function (val) {
+      var str = "";
+      str = val.replace(/[^a-zA-Z0-9]+/gi, "-").toLowerCase(); // 正则去除非字母外的其他字符
+      str = str.startsWith("-") ? str.substring(1) : str; // 去除首“-”
+      str = str.endsWith("-") ? str.substring(0, str.length - 1) : str; // 去除尾“-”
+      this.form.route = str;
+    },
   },
   created() {
     this.getList();

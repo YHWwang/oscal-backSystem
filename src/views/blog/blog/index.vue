@@ -219,7 +219,7 @@
           />
         </el-form-item>
         <el-form-item label="博客路由" prop="blogRoute">
-          <el-input v-model="form.blogRoute" placeholder="请输入博客路由" />
+          <el-input :disabled="form.id" v-model="form.blogRoute" placeholder="请输入博客路由" />
         </el-form-item>
         <el-form-item label="seo标题" prop="seoTitle">
           <el-input v-model="form.seoTitle" placeholder="请输入seo标题" />

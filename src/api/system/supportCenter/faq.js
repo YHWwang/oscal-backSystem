@@ -2,7 +2,7 @@ import request from '@/utils/request'
 // 查询多语言
 export function getLang(query) {
   return request({
-    url: '/system/supportFaqLang/getInfo',
+    url: '/system/lang/getInfo',
     method: 'get',
     params: query
   })
@@ -10,7 +10,7 @@ export function getLang(query) {
 // 保存多语言
 export function saveLang(data) {
   return request({
-    url: '/system/supportFaqLang/saveOrUpdate',
+    url: '/system/lang/saveOrUpdate',
     method: 'post',
     data: data
   })
@@ -18,7 +18,7 @@ export function saveLang(data) {
 // 查询产品分类
 export function getOption(query) {
   return request({
-    url: '/system/supportProduct/option',
+    url: '/system/support/product/option',
     method: 'get',
     params: query
   })
@@ -26,7 +26,7 @@ export function getOption(query) {
 // 查询分类
 export function getCategory(query) {
   return request({
-    url: '/system/supportCategory/option',
+    url: '/system/support/category/option',
     method: 'get',
     params: query
   })

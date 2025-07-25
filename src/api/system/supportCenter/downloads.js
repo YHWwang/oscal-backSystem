@@ -2,7 +2,7 @@ import request from '@/utils/request'
 // 查询分类
 export function getOption(query) {
   return request({
-    url: '/system/supportProduct/option',
+    url: '/system/support/product/option',
     method: 'get',
     params: query
   })

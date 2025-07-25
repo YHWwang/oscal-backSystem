@@ -7,6 +7,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
+            v-hasPermi="['system:state:add']"
           >新增</el-button
         >
       </el-col>
@@ -48,6 +49,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
+            v-hasPermi="['system:state:edit']"
             >修改</el-button
           >
           <el-button
@@ -55,6 +57,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
+            v-hasPermi="['system:state:remove']"
             >删除</el-button
           >
         </template>
@@ -99,8 +102,8 @@
 
         <el-form-item label="状态" prop="isShow">
           <el-radio-group v-model="form.isShow">
-            <el-radio label="0">显示</el-radio>
-            <el-radio label="1">隐藏</el-radio>
+            <el-radio :label="0">显示</el-radio>
+            <el-radio :label="1">隐藏</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -196,7 +199,7 @@ export default {
         id: null,
         stateName: null,
         countryId: null,
-        isShow: "0",
+        isShow: 0,
       };
       if (this.$refs["form"]) {
         this.$refs["form"].resetFields();

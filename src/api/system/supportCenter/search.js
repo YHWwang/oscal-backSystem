@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 查询
 export function getLists(query) {
   return request({
-    url: '/system/recom',
+    url: '/system/recom/list',
     method: 'get',
     params: query
   })

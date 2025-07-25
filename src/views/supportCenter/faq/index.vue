@@ -61,6 +61,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
+            v-hasPermi="['system:faq:add']"
           >新增</el-button
         >
       </el-col>
@@ -132,11 +133,11 @@
         prop="createTime"
         width="150"
       />
-      <el-table-column label="已配置语言" align="center" prop="alreadySetLang">
+      <!-- <el-table-column label="已配置语言" align="center" prop="alreadySetLang">
         <template slot-scope="scope">
           {{ formatLang(scope.row.alreadySetLang) }}
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         label="操作"
         align="center"
@@ -144,17 +145,18 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="scope">
-          <el-button
+          <!-- <el-button
             type="text"
             icon="el-icon-setting"
             @click="handleCommand(scope.row.id)"
             >多语种配置</el-button
-          >
+          > -->
           <el-button
             size="mini"
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
+            v-hasPermi="['system:faq:edit']"
             >修改</el-button
           >
           <el-button
@@ -162,6 +164,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
+            v-hasPermi="['system:faq:remove']"
             >删除</el-button
           >
         </template>

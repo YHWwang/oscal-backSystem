@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // info查询
 export function getLists(query) {
   return request({
-    url: 'system/warranty/category',
+    url: 'system/warranty/category/list',
     method: 'get',
     // params: data
   })

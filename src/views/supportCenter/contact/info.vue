@@ -70,7 +70,7 @@
 <script>
 import { getLists, getModels } from "@/api/system/supportCenter/contact";
 export default {
-  name: "Contact Us Info",
+  name: "ContactUsInfo",
 
   data() {
     return {
@@ -99,6 +99,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         addTime: [],
+        beginTime: "",
+        endTime: "",
       },
     };
   },
@@ -118,12 +120,14 @@ export default {
         pageNum: 1,
         pageSize: 10,
         addTime: [],
+        beginTime: "",
+        endTime: "",
       };
       this.getList();
     },
     CustomDate(date) {
       /*自定义时间 7天or30天*/
-      this.queryParams.page = 1
+      this.queryParams.page = 1;
       this.queryParams.addTime = [this.date_count(date), this.date_count(0)];
       this.$nextTick(() => {
         this.getList();
@@ -162,7 +166,7 @@ export default {
 
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.page = 1
+      this.queryParams.pageNum = 1;
       this.$refs["queryForm"].validate((valid) => {
         if (valid) {
           this.getList();
@@ -172,10 +176,24 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
-      getLists(this.queryParams).then((response) => {
+      if (this.queryParams.addTime?.length) {
+        this.queryParams.beginTime = this.queryParams?.addTime[0];
+        this.queryParams.endTime = this.queryParams?.addTime[1];
+      }else{
+        this.queryParams.beginTime = null
+        this.queryParams.endTime = null
+      }
+      let query = {
+        pageNum: this.queryParams.pageNum,
+        pageSize: this.queryParams.pageSize,
+        beginTime: this.queryParams.beginTime,
+        endTime: this.queryParams.endTime,
+      };
+      getLists(query).then((response) => {
         this.dataList = response.rows;
+        let ids = this.dataList.map(p=>p.modelId)
         if (this.dataList.length > 0) {
-          getModels(response.modelIds).then((res) => {
+          getModels(ids).then((res) => {
             this.modelsList = res.modelsList;
           });
         }

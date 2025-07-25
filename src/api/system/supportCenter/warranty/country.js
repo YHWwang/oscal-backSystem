@@ -1,12 +1,11 @@
 import request from '@/utils/request'
-import qs from "qs";
 
 // info查询
 export function getLists(query) {
 
 
   return request({
-    url: 'system/warranty/country',
+    url: 'system/warranty/country/list',
     method: 'get',
     params: query
   })

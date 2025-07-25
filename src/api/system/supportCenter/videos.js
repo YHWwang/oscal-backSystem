@@ -1,8 +1,8 @@
 import request from '@/utils/request'
-// 查询分类
+// 查询产品
 export function getOption(query) {
   return request({
-    url: '/api/supportProduct/option',
+    url: '/system/support/product/option',
     method: 'get',
     params: query
   })

@@ -8,6 +8,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
+            v-hasPermi="['system:container:add']"
         >新增</el-button
         >
       </el-col>
@@ -34,6 +35,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
+            v-hasPermi="['system:container:edit']"
           >修改</el-button
           >
           <el-button
@@ -41,6 +43,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
+            v-hasPermi="['system:container:remove']"
           >删除</el-button
           >
         </template>
@@ -74,13 +77,13 @@
         <el-form-item label="container2" prop="container2">
           <el-input v-model="form.container2" type="textarea" rows="5" placeholder="请输入container2" />
         </el-form-item>
-        <el-form-item label="container3" prop="container1">
+        <el-form-item label="container3" prop="container3">
           <el-input v-model="form.container3" type="textarea" rows="5" placeholder="请输入container3" />
         </el-form-item>
         <el-form-item label="container4" prop="container4">
           <el-input v-model="form.container4" type="textarea" rows="5" placeholder="请输入container4" />
         </el-form-item>
-        <el-form-item label="Title" prop="container1">
+        <el-form-item label="Title" prop="title">
           <el-input v-model="form.title" type="textarea" rows="5" placeholder="请输入Title" />
         </el-form-item>
         <el-form-item label="keywords" prop="keywords">
@@ -109,7 +112,7 @@ import {
 import { deepClone } from "@/utils/index";
 
 export default {
-  name: "Contact Us Cnfo",
+  name: "ContactUsCode",
 
   data() {
     return {
@@ -143,14 +146,14 @@ export default {
       // 表单校验
       rules: {
         container1: [
-          { required: false, message: "", trigger: "change" },
+          { required: true, message: "container1不可为空", trigger: "change" },
         ],
         container2: [
-          { required: false, message: "", trigger: "change" },
+          { required: true, message: "container2不可为空", trigger: "change" },
         ],
-        container3: [
-          { required: false, message: "", trigger: "change" },
-        ]
+        // container3: [
+        //   { required: false, message: "", trigger: "change" },
+        // ]
       },
     };
   },

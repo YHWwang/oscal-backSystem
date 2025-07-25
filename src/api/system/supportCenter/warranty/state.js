@@ -3,7 +3,7 @@ import request from '@/utils/request'
 
 export function getCountry(query) {
   return request({
-    url: 'system/warranty/country',
+    url: 'system/warranty/country/list',
     method: 'get',
     params: query
   })
@@ -11,7 +11,7 @@ export function getCountry(query) {
 
 export function getLists(query) {
   return request({
-    url: 'system/state',
+    url: 'system/state/list',
     method: 'get',
     params: query
   })

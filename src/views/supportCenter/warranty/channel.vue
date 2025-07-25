@@ -7,6 +7,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
+            v-hasPermi="['system:category:add']"
           >新增</el-button
         >
       </el-col>
@@ -51,6 +52,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
+            v-hasPermi="['system:category:edit']"
             >修改</el-button
           >
           <el-button
@@ -58,6 +60,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
+            v-hasPermi="['system:category:remove']"
             >删除</el-button
           >
         </template>

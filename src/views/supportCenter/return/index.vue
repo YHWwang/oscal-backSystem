@@ -8,6 +8,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
+            v-hasPermi="['system:container:add']"
         >新增</el-button
         >
       </el-col>
@@ -31,6 +32,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
+            v-hasPermi="['system:container:edit']"
           >修改</el-button
           >
           <el-button
@@ -38,6 +40,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
+            v-hasPermi="['system:container:remove']"
           >删除</el-button
           >
         </template>
@@ -135,7 +138,7 @@ export default {
       // 表单校验
       rules: {
         refundContainer: [
-          { required: false, message: "请输入内容", trigger: "change" },
+          { required: true, message: "请输入内容", trigger: "change" },
         ]
 
       },

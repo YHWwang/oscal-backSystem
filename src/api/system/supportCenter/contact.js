@@ -1,13 +1,11 @@
 import request from '@/utils/request'
-import qs from "qs";
 
 // info查询
 export function getLists(query) {
-  let data= qs.stringify(query, { indices: false })
   return request({
-    url: '/system/contact/us/list?'+data,
+    url: '/system/email/list',
     method: 'get',
-    // params: query
+    params: query
   })
 }
 // html查询
@@ -21,7 +19,7 @@ export function getHtmlLists(query) {
 // 查询机型ID
 export function getModels(data) {
   return request({
-    url: 'sale/refund/getModelList/'+data,
+    url: 'system/email/refund/getModelList/'+data,
     method: 'get',
   })
 }

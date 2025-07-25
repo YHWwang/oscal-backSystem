@@ -121,7 +121,7 @@
           <el-input v-model="form.name" placeholder="请输入分类名称" />
         </el-form-item>
         <el-form-item label="路由" prop="route">
-          <el-input v-model="form.route" placeholder="请输入路由" />
+          <el-input :disabled="form.id" v-model="form.route" placeholder="请输入路由" />
         </el-form-item>
         <el-form-item label="SEO标题" prop="seoTitle">
           <el-input v-model="form.seoTitle" placeholder="请输入SEO标题" />

@@ -1,20 +1,18 @@
 import request from '@/utils/request'
-import qs from "qs";
 
 // info查询
 export function getLists(query) {
 
- let data= qs.stringify(query, { indices: false })
   return request({
-    url: 'system/question?'+data ,
+    url: 'system/question/list' ,
     method: 'get',
-    // params: data
+    params: query
   })
 }
 // html查询
 export function getHtmlLists(query) {
   return request({
-    url: 'system/warranty/container',
+    url: 'system/warranty/container/list',
     method: 'get',
     params: query
   })
